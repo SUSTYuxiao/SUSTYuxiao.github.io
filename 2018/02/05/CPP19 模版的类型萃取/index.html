@@ -79,13 +79,17 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="zpx&#39;s HomePage">
-<meta property="og:url" content="https://sustyuxiao.github.io/index.html">
+<meta name="description" content="模版/模版函数的全特化/偏特化与类型萃取技术在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取 一、模版的全特化、偏特化1234567891011121314151617181920212223242526272829template&amp;lt;typename T1, typename T2&amp;gt;  class Test  &amp;#123;  public:      Test(T1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hello World">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/02/05/CPP19 模版的类型萃取/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
+<meta property="og:description" content="模版/模版函数的全特化/偏特化与类型萃取技术在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取 一、模版的全特化、偏特化1234567891011121314151617181920212223242526272829template&amp;lt;typename T1, typename T2&amp;gt;  class Test  &amp;#123;  public:      Test(T1">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-05T04:34:44.234Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zpx&#39;s HomePage">
+<meta name="twitter:title" content="Hello World">
+<meta name="twitter:description" content="模版/模版函数的全特化/偏特化与类型萃取技术在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取 一、模版的全特化、偏特化1234567891011121314151617181920212223242526272829template&amp;lt;typename T1, typename T2&amp;gt;  class Test  &amp;#123;  public:      Test(T1">
 
 
 
@@ -115,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="https://sustyuxiao.github.io/"/>
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/02/05/CPP19 模版的类型萃取/"/>
 
 
 
 
 
-  <title>zpx's HomePage</title>
+  <title>Hello World | zpx's HomePage</title>
   
 
 
@@ -140,8 +144,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -234,9 +237,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -266,9 +269,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/05/CPP19 模版的类型萃取/" itemprop="url">Hello World</a></h1>
+          <h1 class="post-title" itemprop="name headline">Hello World</h1>
         
 
         <div class="post-meta">
@@ -318,9 +319,7 @@
       
 
       
-        
-          
-            <h1 id="模版-模版函数的全特化-偏特化与类型萃取技术"><a href="#模版-模版函数的全特化-偏特化与类型萃取技术" class="headerlink" title="模版/模版函数的全特化/偏特化与类型萃取技术"></a>模版/模版函数的全特化/偏特化与类型萃取技术</h1><p>在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取</p>
+        <h1 id="模版-模版函数的全特化-偏特化与类型萃取技术"><a href="#模版-模版函数的全特化-偏特化与类型萃取技术" class="headerlink" title="模版/模版函数的全特化/偏特化与类型萃取技术"></a>模版/模版函数的全特化/偏特化与类型萃取技术</h1><p>在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取</p>
 <h2 id="一、模版的全特化、偏特化"><a href="#一、模版的全特化、偏特化" class="headerlink" title="一、模版的全特化、偏特化"></a>一、模版的全特化、偏特化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">template&lt;typename T1, typename T2&gt;  </span><br><span class="line">class Test  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    Test(T1 i,T2 j):a(i),b(j)&#123;cout&lt;&lt;&quot;模板类&quot;&lt;&lt;endl;&#125;  </span><br><span class="line">private:  </span><br><span class="line">    T1 a;  </span><br><span class="line">    T2 b;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line">template&lt;&gt;  </span><br><span class="line">class Test&lt;int , char&gt;  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    Test(int i, char j):a(i),b(j)&#123;cout&lt;&lt;&quot;全特化&quot;&lt;&lt;endl;&#125;  </span><br><span class="line">private:  </span><br><span class="line">    int a;  </span><br><span class="line">    char b;  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line">template &lt;typename T2&gt;  </span><br><span class="line">class Test&lt;char, T2&gt;  </span><br><span class="line">&#123;  </span><br><span class="line">public:  </span><br><span class="line">    Test(char i, T2 j):a(i),b(j)&#123;cout&lt;&lt;&quot;偏特化&quot;&lt;&lt;endl;&#125;  </span><br><span class="line">private:  </span><br><span class="line">    char a;  </span><br><span class="line">    T2 b;  </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>调用时，依次对应上述代码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Test&lt;double , double&gt; t1(0.1,0.2);  //调用模版类</span><br><span class="line">Test&lt;int , char&gt; t2(1,&apos;A&apos;);  //调用模版类的全特化</span><br><span class="line">Test&lt;char, bool&gt; t3(&apos;A&apos;,true);  //调用模版类的偏特化</span><br></pre></td></tr></table></figure>
@@ -345,8 +344,6 @@
 <hr>
 <p><center>@张鹏霄 zpx736312737@126.com</center> </p>
 
-          
-        
       
     </div>
     
@@ -358,145 +355,51 @@
     
 
     
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    张鹏霄
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://sustyuxiao.github.io/2018/02/05/CPP19 模版的类型萃取/" title="Hello World">https://sustyuxiao.github.io/2018/02/05/CPP19 模版的类型萃取/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
 
     <footer class="post-footer">
       
 
       
-
-      
-
       
       
-        <div class="post-eof"></div>
+
       
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/02/05/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="张鹏霄">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="zpx's HomePage">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/05/hello-world/" itemprop="url">Hello World</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-05T00:01:05+08:00">
-                2018-02-05
-              </time>
+              <a href="/2018/02/05/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -506,10 +409,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -517,6 +421,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -537,8 +445,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -584,6 +501,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#模版-模版函数的全特化-偏特化与类型萃取技术"><span class="nav-number">1.</span> <span class="nav-text">模版/模版函数的全特化/偏特化与类型萃取技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、模版的全特化、偏特化"><span class="nav-number">1.1.</span> <span class="nav-text">一、模版的全特化、偏特化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、模版函数的全特化-偏特化"><span class="nav-number">1.2.</span> <span class="nav-text">二、模版函数的全特化/偏特化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、类型萃取"><span class="nav-number">1.3.</span> <span class="nav-text">三、类型萃取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题提出"><span class="nav-number">1.3.1.</span> <span class="nav-text">问题提出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题分析"><span class="nav-number">1.3.2.</span> <span class="nav-text">问题分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类型萃取"><span class="nav-number">1.3.3.</span> <span class="nav-text">类型萃取</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -722,6 +655,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
