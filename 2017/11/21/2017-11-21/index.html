@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取">
+<meta name="description" content="使用模版需要对不同的类型作不同的处理时，需要模版萃取同时，模版/模版函数的全特化/偏特化 是一个易混淆的知识点，整理如下">
 <meta property="og:type" content="article">
 <meta property="og:title" content="模版&#x2F;模版函数的全特化&#x2F;偏特化与类型萃取">
 <meta property="og:url" content="https://sustyuxiao.github.io/2017/11/21/2017-11-21/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取">
+<meta property="og:description" content="使用模版需要对不同的类型作不同的处理时，需要模版萃取同时，模版/模版函数的全特化/偏特化 是一个易混淆的知识点，整理如下">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-05T11:23:26.000Z">
+<meta property="og:updated_time" content="2018-02-05T12:56:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="模版&#x2F;模版函数的全特化&#x2F;偏特化与类型萃取">
-<meta name="twitter:description" content="在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取">
+<meta name="twitter:description" content="使用模版需要对不同的类型作不同的处理时，需要模版萃取同时，模版/模版函数的全特化/偏特化 是一个易混淆的知识点，整理如下">
 
 
 
@@ -342,7 +342,7 @@
       
 
       
-        <p>在使用模版时我们有时需要对不同的类型作不同的处理，这里需要模版萃取</p>
+        <p>使用模版需要对不同的类型作不同的处理时，需要模版萃取<br>同时，模版/模版函数的全特化/偏特化 是一个易混淆的知识点，整理如下</p>
 <a id="more"></a>
 <h2 id="一、模版的全特化、偏特化"><a href="#一、模版的全特化、偏特化" class="headerlink" title="一、模版的全特化、偏特化"></a>一、模版的全特化、偏特化</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span>  </span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">    Test(T1 i,T2 j):a(i),b(j)&#123;<span class="built_in">cout</span>&lt;&lt;<span class="string">"模板类"</span>&lt;&lt;<span class="built_in">endl</span>;&#125;  </span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">    T1 a;  </span><br><span class="line">    T2 b;  </span><br><span class="line">&#125;;  </span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span>&lt;&gt;  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span>&lt;int , char&gt;  </span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">    Test(<span class="keyword">int</span> i, <span class="keyword">char</span> j):a(i),b(j)&#123;<span class="built_in">cout</span>&lt;&lt;<span class="string">"全特化"</span>&lt;&lt;<span class="built_in">endl</span>;&#125;  </span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">    <span class="keyword">int</span> a;  </span><br><span class="line">    <span class="keyword">char</span> b;  </span><br><span class="line">&#125;;  </span><br><span class="line">  </span><br><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T2&gt;  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Test</span>&lt;char, T2&gt;  </span></span><br><span class="line"><span class="class">&#123;</span>  </span><br><span class="line"><span class="keyword">public</span>:  </span><br><span class="line">    Test(<span class="keyword">char</span> i, T2 j):a(i),b(j)&#123;<span class="built_in">cout</span>&lt;&lt;<span class="string">"偏特化"</span>&lt;&lt;<span class="built_in">endl</span>;&#125;  </span><br><span class="line"><span class="keyword">private</span>:  </span><br><span class="line">    <span class="keyword">char</span> a;  </span><br><span class="line">    T2 b;  </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>调用时，依次对应上述代码</p>
