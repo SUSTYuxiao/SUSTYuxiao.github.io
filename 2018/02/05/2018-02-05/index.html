@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="成品预览 https://sustyuxiao.github.io 概述通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。">
+<meta name="description" content="通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="基于 GitHub Page 使用 hexo 框架生成静态博客部署全记录">
 <meta property="og:url" content="https://sustyuxiao.github.io/2018/02/05/2018-02-05/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="成品预览 https://sustyuxiao.github.io 概述通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。">
+<meta property="og:description" content="通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-05T12:54:15.261Z">
+<meta property="og:updated_time" content="2018-02-06T19:19:07.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="基于 GitHub Page 使用 hexo 框架生成静态博客部署全记录">
-<meta name="twitter:description" content="成品预览 https://sustyuxiao.github.io 概述通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。">
+<meta name="twitter:description" content="通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。">
 
 
 
@@ -333,11 +333,9 @@
       
 
       
-        <p>成品预览 <a href="https://sustyuxiao.github.io">https://sustyuxiao.github.io</a></p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦<br>不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。</p>
+        <p>通常搭建一个个人博客需要租用「虚拟服务器」，在服务器部署整个服务端，成本较高，维护麻烦<br>不同于自行部署整个服务端的成本高昂，使用静态网页的形式可以大大减少部署成本。</p>
 <a id="more"></a>
-<p>同时由于结构简单（简陋），静态网页不怕 SQL注入 等攻击。</p>
-<p>GitHub 提供了一个免费的 300M 大小的免费空间供我们放置静态网页并直接访问，需要我们在GitHub新建一个特定名称的 Repo ，在推送静态网页到 Github 后即可访问特定域名访问博客。</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>GitHub 提供了一个免费的 300M 大小的免费空间供我们放置静态网页并直接访问，需要我们在GitHub新建一个特定名称的 Repo ，在推送静态网页到 Github 后即可访问特定域名访问博客。</p>
 <p>以 GitHub 名 SUSTYuxiao 为例：<br>新建项目 SUSTYuxiao.github.io，部署后可通过 <a href="https://sustyuxiao.github.io">https://sustyuxiao.github.io</a> 访问</p>
 <p>hexo 是一个可以自动化生成 静态页面的工具，结合 GitHub 上丰富的主题，可以高效简单地部署个人静态博客。</p>
 <p>本文不再赘述 Git 基本命令</p>
@@ -395,6 +393,8 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ chmod +x ./push.sh</span><br></pre></td></tr></table></figure>
 <p>随后我们即可通过以下代码推送所有修改</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./push.sh</span><br></pre></td></tr></table></figure>
+<p>成品预览 <a href="https://sustyuxiao.github.io">https://sustyuxiao.github.io</a></p>
+<hr>
 <p>仍存在的一个小问题是，执行<code>./push.sh</code>后 GitHub Page 页面部分样式没有变化，需要再执行一次，或者修改脚本为</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">cp -rf ./public/* ./SUSTYuxiao.github.io</span><br><span class="line">cd SUSTYuxiao.github.io</span><br><span class="line">git add -A</span><br><span class="line">git commit -m “update”</span><br><span class="line">git push</span><br><span class="line"><span class="meta">#</span><span class="bash">run sh again to make sure GitHub page is the last release</span></span><br><span class="line">cd ..</span><br><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">cp -rf ./public/* ./SUSTYuxiao.github.io</span><br><span class="line">cd SUSTYuxiao.github.io</span><br><span class="line">git add -A</span><br><span class="line">git commit -m “update”</span><br><span class="line">git push</span><br></pre></td></tr></table></figure>
 <p>有解决方案的大佬希望告诉我一下呀 </p>
