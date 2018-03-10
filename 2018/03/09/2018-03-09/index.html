@@ -79,22 +79,22 @@
 
 
 
-<meta name="description" content="###基础概念  重写（覆盖）：前提条件：父类函数为虚函数子类函数与父类函数完全相同时（返回值、函数名、参数），称作重写（覆盖）了父类函数  协变：前提条件：构成重写父类函数（虚函数）返回值为父类的引用/指针，子类函数的返回值为子类的引用/指针  重定义（隐藏）前提条件：不构成重写函数名相同  动态联编指针/引用 + 虚函数（将在虚表中寻找函数的函数地址）  多态虚函数的重写 + 动态联编多态的目">
+<meta name="description" content="c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++ 多态对象模型&#x2F;虚继承对象模型">
 <meta property="og:url" content="https://sustyuxiao.github.io/2018/03/09/2018-03-09/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="###基础概念  重写（覆盖）：前提条件：父类函数为虚函数子类函数与父类函数完全相同时（返回值、函数名、参数），称作重写（覆盖）了父类函数  协变：前提条件：构成重写父类函数（虚函数）返回值为父类的引用/指针，子类函数的返回值为子类的引用/指针  重定义（隐藏）前提条件：不构成重写函数名相同  动态联编指针/引用 + 虚函数（将在虚表中寻找函数的函数地址）  多态虚函数的重写 + 动态联编多态的目">
+<meta property="og:description" content="c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table2.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table4.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table3.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_class_table.jpg">
-<meta property="og:updated_time" content="2018-03-10T07:37:29.000Z">
+<meta property="og:updated_time" content="2018-03-10T07:46:47.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++ 多态对象模型&#x2F;虚继承对象模型">
-<meta name="twitter:description" content="###基础概念  重写（覆盖）：前提条件：父类函数为虚函数子类函数与父类函数完全相同时（返回值、函数名、参数），称作重写（覆盖）了父类函数  协变：前提条件：构成重写父类函数（虚函数）返回值为父类的引用/指针，子类函数的返回值为子类的引用/指针  重定义（隐藏）前提条件：不构成重写函数名相同  动态联编指针/引用 + 虚函数（将在虚表中寻找函数的函数地址）  多态虚函数的重写 + 动态联编多态的目">
+<meta name="twitter:description" content="c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型">
 <meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table.jpg">
 
 
@@ -350,7 +350,8 @@
       
 
       
-        <p>###基础概念</p>
+        <p>c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。<br>本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型<br><a id="more"></a></p>
+<p>###基础概念</p>
 <ul>
 <li><p>重写（覆盖）：<br>前提条件：父类函数为虚函数<br>子类函数与父类函数完全相同时（返回值、函数名、参数），称作重写（覆盖）了父类函数</p>
 </li>
