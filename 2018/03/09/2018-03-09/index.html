@@ -91,7 +91,7 @@
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table4.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table3.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_class_table.jpg">
-<meta property="og:updated_time" content="2018-03-10T07:49:45.000Z">
+<meta property="og:updated_time" content="2018-03-10T07:51:12.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++ 多态对象模型&#x2F;虚继承对象模型">
 <meta name="twitter:description" content="c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型">
@@ -352,7 +352,7 @@
       
         <p>c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。<br>本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型</p>
 <a id="more"></a>
-<h3 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h3><ul>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><ul>
 <li><p>重写（覆盖）：<br>前提条件：父类函数为虚函数<br>子类函数与父类函数完全相同时（返回值、函数名、参数），称作重写（覆盖）了父类函数</p>
 </li>
 <li><p>协变：<br>前提条件：构成重写<br>父类函数（虚函数）返回值为父类的引用/指针，子类函数的返回值为子类的引用/指针</p>
@@ -597,7 +597,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础概念"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚函数表对象模型-多态的实现"><span class="nav-number"></span> <span class="nav-text">虚函数表对象模型 - 多态的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#虚函数表在菱形继承"><span class="nav-number">1.</span> <span class="nav-text">虚函数表在菱形继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚基表，虚拟继承，解决二义性问题"><span class="nav-number">2.</span> <span class="nav-text">虚基表，虚拟继承，解决二义性问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附录：典例1"><span class="nav-number">3.</span> <span class="nav-text">附录：典例1</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础概念"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚函数表对象模型-多态的实现"><span class="nav-number">2.</span> <span class="nav-text">虚函数表对象模型 - 多态的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#虚函数表在菱形继承"><span class="nav-number">2.1.</span> <span class="nav-text">虚函数表在菱形继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#虚基表，虚拟继承，解决二义性问题"><span class="nav-number">2.2.</span> <span class="nav-text">虚基表，虚拟继承，解决二义性问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#附录：典例1"><span class="nav-number">2.3.</span> <span class="nav-text">附录：典例1</span></a></li></ol></li></ol></div>
             
 
           </div>
