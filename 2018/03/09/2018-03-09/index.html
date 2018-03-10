@@ -91,7 +91,7 @@
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table4.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table3.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_class_table.jpg">
-<meta property="og:updated_time" content="2018-03-10T07:57:16.000Z">
+<meta property="og:updated_time" content="2018-03-10T08:02:15.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++ 多态对象模型&#x2F;虚继承对象模型">
 <meta name="twitter:description" content="c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型">
@@ -391,7 +391,7 @@
 <li><p>二义性<br>在对象c调用weight时，如果单继承很简单，但在多继承中，该对象不知道应调用A，B哪一个类下的weight</p>
 </li>
 </ul>
-<h2 id="虚基表，虚拟继承，解决二义性问题"><a href="#虚基表，虚拟继承，解决二义性问题" class="headerlink" title="虚基表，虚拟继承，解决二义性问题"></a>虚基表，虚拟继承，解决二义性问题</h2><p>声明虚继承后，虚表中不会出现重复项（数据冗余），同时使用一张表（虚基表）指明继承关系。</p>
+<h2 id="虚继承，虚基表解决二义性、容易解决问题"><a href="#虚继承，虚基表解决二义性、容易解决问题" class="headerlink" title="虚继承，虚基表解决二义性、容易解决问题"></a>虚继承，虚基表解决二义性、容易解决问题</h2><p>声明虚继承后，虚表中不会出现重复项（数据冗余），同时使用一张表（虚基表）指明继承关系。</p>
 <blockquote>
 <p>在VS环境下，对象虚函数表指针的下一个字中，存储的不是对象的成员变量，虚基表<br>虚基类表仅是Microsoft编译器的解决办法。在其他编译器中，一般采用在虚函数表中放置虚基类的偏移量的方式。</p>
 </blockquote>
@@ -597,7 +597,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础概念"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚函数表对象模型-多态的实现"><span class="nav-number">2.</span> <span class="nav-text">虚函数表对象模型 - 多态的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚函数表在菱形继承"><span class="nav-number">3.</span> <span class="nav-text">虚函数表在菱形继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚基表，虚拟继承，解决二义性问题"><span class="nav-number">4.</span> <span class="nav-text">虚基表，虚拟继承，解决二义性问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#附录：典例1"><span class="nav-number">4.1.</span> <span class="nav-text">附录：典例1</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基础概念"><span class="nav-number">1.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚函数表对象模型-多态的实现"><span class="nav-number">2.</span> <span class="nav-text">虚函数表对象模型 - 多态的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚函数表在菱形继承"><span class="nav-number">3.</span> <span class="nav-text">虚函数表在菱形继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚继承，虚基表解决二义性、容易解决问题"><span class="nav-number">4.</span> <span class="nav-text">虚继承，虚基表解决二义性、容易解决问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#附录：典例1"><span class="nav-number">4.1.</span> <span class="nav-text">附录：典例1</span></a></li></ol></li></ol></div>
             
 
           </div>
