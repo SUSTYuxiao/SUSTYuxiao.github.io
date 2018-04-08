@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」 信号的基本概念信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。 信号分为  标准信号（同时发送多个同一信号时可能发生丢失） 实时信号（通过队列实现信号的稳定处理）  本文主要研究1-31号（非实时信号）来理解信号">
+<meta property="og:type" content="article">
+<meta property="og:title" content="透过系统 API 看「信号」">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/04/08/2018-04-08/index.html">
+<meta property="og:site_name" content="zpx&#39;s HomePage">
+<meta property="og:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」 信号的基本概念信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。 信号分为  标准信号（同时发送多个同一信号时可能发生丢失） 实时信号（通过队列实现信号的稳定处理）  本文主要研究1-31号（非实时信号）来理解信号">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable1.jpg">
+<meta property="og:updated_time" content="2018-04-08T17:53:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="透过系统 API 看「信号」">
+<meta name="twitter:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」 信号的基本概念信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。 信号分为  标准信号（同时发送多个同一信号时可能发生丢失） 实时信号（通过队列实现信号的稳定处理）  本文主要研究1-31号（非实时信号）来理解信号">
+<meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/04/08/2018-04-08/"/>
+
+
+
+
+
+  <title>透过系统 API 看「信号」 | zpx's HomePage</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-post-detail
+">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zpx's HomePage</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/04/08/2018-04-08/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张鹏霄">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zpx's HomePage">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">透过系统 API 看「信号」</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-08T00:00:00+08:00">
+                2018-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统编程/" itemprop="url" rel="index">
+                    <span itemprop="name">系统编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody" >
+
+      
+      
+
+      
+        <p>「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。</p>
+<p>本文通过对系统相关API的使用来深度理解系统编程的「信号」</p>
+<h2 id="信号的基本概念"><a href="#信号的基本概念" class="headerlink" title="信号的基本概念"></a>信号的基本概念</h2><p>信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。</p>
+<p>信号分为</p>
+<ul>
+<li>标准信号（同时发送多个同一信号时可能发生丢失）</li>
+<li>实时信号（通过队列实现信号的稳定处理）</li>
+</ul>
+<p>本文主要研究1-31号（非实时信号）来理解信号。</p>
+<h2 id="信号的处理流程"><a href="#信号的处理流程" class="headerlink" title="信号的处理流程"></a>信号的处理流程</h2><p>信号的处理的实质是维护进程PCB中的特定数据：Block 表、Pending 表和 handler 表。<br>为了解释上述结构，首先明确以下概念</p>
+<ul>
+<li>抵达：信号发送成功后的处理动作</li>
+<li>未决：信号待处理的状态（将会在合适时机自动处理）</li>
+<li>阻塞：标记信号暂时不应被处理（”人为暂停某个信号的处理“）</li>
+</ul>
+<p>一般来讲，信号产生后首先会进入未决状态。在合适的时机才会执行对应的默认方法(抵达）。<br>当一个信号进入阻塞态后，在阻塞状态被修改前永远不会执行对应的方法。</p>
+<p>信号从产生到抵达总是伴随着 用户态与内核态的相互转换（高权限的任务由内核完成）<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg" alt=""><br>一般情况下的未决（没有被阻塞），正是表示信号产生「但内核还未转换到用户态」时的状态。</p>
+<h2 id="Block-amp-Pending-amp-handler"><a href="#Block-amp-Pending-amp-handler" class="headerlink" title="Block &amp; Pending &amp; handler"></a>Block &amp; Pending &amp; handler</h2><p>上述状态的改变体现在 PCB 中时，标记以 0、1 表示，如下图</p>
+<p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable1.jpg" alt=""></p>
+<p>上图说明了信号典型的三种情况：</p>
+<ul>
+<li>对于9号信号（第一行） <ul>
+<li>产生后进入了未决状态（pending）。</li>
+<li>从内核态转为用户态时，信号会抵达，执行默认方法（SIG_DEF)</li>
+</ul>
+</li>
+<li>对于2号信号（第二行）<ul>
+<li>产生后由于处于阻塞态，在状态改变前永远不会被抵达。</li>
+<li>如果不在解除阻塞前修改 handler 表，抵达时将会执行忽略方法（不进行任何处理）。</li>
+</ul>
+</li>
+<li>对于3号信号（第三行）<ul>
+<li>pending 标志为为 0 ，说明信号从未产生过，当信号产生时将被阻塞。</li>
+<li>如果不在解除阻塞前修改 handler 表，抵达时将会执行用户自定义函数。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>1-13信号可以通过 <code>kill -l</code> 命令查询</p>
+</blockquote>
+<p>从上述例子也可以明确：信号可选的处理方式有三种</p>
+<ul>
+<li>默认方法</li>
+<li>忽略</li>
+<li>用户自定义</li>
+</ul>
+<h2 id="信号-API"><a href="#信号-API" class="headerlink" title="信号 API"></a>信号 API</h2><h5 id="阻塞-ctrl-C"><a href="#阻塞-ctrl-C" class="headerlink" title="阻塞 ctrl C"></a>阻塞 ctrl C</h5><p>我们常用的 ctrl c 组合键即是一个产生信号的方法，它可以用来提前结束正在运行的程序。<br>ctrl c 对应2号信号 SIGINT ，我们可以通过下列程序实现屏蔽该信号。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//代码解释见下文，下同</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;signal.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">PrintSig</span><span class="params">(<span class="keyword">sigset_t</span> *<span class="built_in">set</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> = <span class="number">0</span>; i &lt; <span class="number">32</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>(sigisember(<span class="built_in">set</span>,i))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">putchar</span>(<span class="string">'1'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">putchar</span>(<span class="string">'0'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">putchar</span>(<span class="string">'\n'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    sigset_s s, p;</span><br><span class="line">    sigemptyset(&amp;s);</span><br><span class="line">    </span><br><span class="line">    sigaddset(&amp;s, SIGINT);</span><br><span class="line">    sigprocmask(SIG_BLOCK, &amp;s, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sigpending(&amp;p);</span><br><span class="line">        printSig(&amp;p);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码中 </p>
+<ul>
+<li>变量 sigset_t 表示信号集，用来表示信号的阻塞/未决的有效状态<ul>
+<li>作为阻塞信号集时，也称作当前进程的信号屏蔽字</li>
+</ul>
+</li>
+<li>信号集操作函数<ul>
+<li><code>sigemptyset(sigset_t *set);</code>初始化set指向的信号集（清零对应bit）</li>
+<li><code>sigaddset(sigset_t *set, int signo);</code>添加指定信号到该信号集</li>
+<li><code>sigismember(const sigset_t *set, int signo);</code>顾名思义，判断是否信号是否存在于信号集</li>
+</ul>
+</li>
+<li><code>int sigprocmask(int how, const sigset_t *set, sigset_t *oset);</code>读取或更改信号屏蔽字<ul>
+<li>成功返回0，失败返回-1</li>
+<li>该函数根据参数分为三种情况<ul>
+<li>仅oset为非空时，读取信号屏蔽字到oset</li>
+<li>仅set为非空时，参考how的值，根据set更改进程的信号屏蔽字</li>
+<li>set、oset都不为空时，先拷贝set到oset，再参考how根据set更改进程的信号屏蔽字</li>
+</ul>
+</li>
+<li>how 有3个取值<ul>
+<li>SIG_BLOCK 表示添加set中的信号到进程的信号屏蔽字</li>
+<li>SIG_UNBLOCK 表示从进程的的信号屏蔽字解除阻塞set中的信号</li>
+<li>SIG_SETMASK 表示修改信号屏蔽字为set中的值</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>sigpending(sigset_t *set);</code>读取当前进程的未决信号集到set</li>
+</ul>
+<h5 id="捕捉信号并自定义处理函数"><a href="#捕捉信号并自定义处理函数" class="headerlink" title="捕捉信号并自定义处理函数"></a>捕捉信号并自定义处理函数</h5><p>在信号抵达时调用用户自定义的函数，叫做捕捉信号。<br>捕捉信号的流程见本文图1，值得强调的是自定义函数与main函数不在一个堆栈<br>捕捉信号需要使用接口 <code>sigaction</code></p>
+<ul>
+<li><code>sigaction(int signo, const struct sigaction *act, sturct sigaction *oact);</code><ul>
+<li>成功返回0，失败返回-1</li>
+<li>根据参数分为两种情况<ul>
+<li>仅act非空时，根据act修改信号的处理动作</li>
+<li>仅oact非空时，拷贝信号原本的处理动作到oact</li>
+<li>都非空时，处理逻辑类似<code>sigprocmask</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>对于参数struct sigaction，unix下的定义如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">sigaction</span> &#123;</span></span><br><span class="line">     <span class="keyword">union</span> __sigaction_u __sigaction_u;  <span class="comment">/* signal handler */</span></span><br><span class="line">     <span class="keyword">sigset_t</span> sa_mask;               <span class="comment">/* signal mask to apply */</span></span><br><span class="line">     <span class="keyword">int</span>     sa_flags;               <span class="comment">/* see signal options below */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">union</span> __sigaction_u &#123;</span><br><span class="line">     <span class="keyword">void</span>    (*__sa_handler)(<span class="keyword">int</span>);</span><br><span class="line">     <span class="keyword">void</span>    (*__sa_sigaction)(<span class="keyword">int</span>, <span class="keyword">siginfo_t</span> *,</span><br><span class="line">                    <span class="keyword">void</span> *);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> sa_handler      __sigaction_u.__sa_handler</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> sa_sigaction    __sigaction_u.__sa_sigaction</span></span><br></pre></td></tr></table></figure>
+<p>其中，在非实时信号下，sa_flags值为0<br>代码实例见下文对sleep的模拟</p>
+<h5 id="模拟sleep"><a href="#模拟sleep" class="headerlink" title="模拟sleep"></a>模拟sleep</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//TODO</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>unsigned int alarm(unsigned int seconds);</code><ul>
+<li>使内核在seconds秒后向当前进程发送SIGALRM信号，默认处理动作是终止当前进程</li>
+<li>返回值为当前闹钟余下的seconds</li>
+<li>若参数second为0，表示取消之前的闹钟，返回值为之前闹钟余下的秒</li>
+</ul>
+</li>
+<li><code>int pause(void);</code><ul>
+<li>调用进程挂起，直到有信号抵达。</li>
+<li>返回值分三种情况<ul>
+<li>信号处理动作是终止进程，则pause无返回的机会</li>
+<li>信号处理动作是忽略，则进程保持挂起，pause不返回</li>
+<li>信号处理动作是捕捉，则调用处理函数后pause返回-1，errno值为EINTR（“被信号中断”）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="可-不可重入函数与volatile"><a href="#可-不可重入函数与volatile" class="headerlink" title="可/不可重入函数与volatile"></a>可/不可重入函数与volatile</h5><p>//TODO</p>
+<h5 id="竞态条件与抵达间隙"><a href="#竞态条件与抵达间隙" class="headerlink" title="竞态条件与抵达间隙"></a>竞态条件与抵达间隙</h5><p>//TODO</p>
+<h5 id="利用SIGCHLD信号清理僵尸进程"><a href="#利用SIGCHLD信号清理僵尸进程" class="headerlink" title="利用SIGCHLD信号清理僵尸进程"></a>利用SIGCHLD信号清理僵尸进程</h5><p>//TODO</p>
+<blockquote>
+<p>该 API 属于system V</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    张鹏霄
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://sustyuxiao.github.io/2018/04/08/2018-04-08/" title="透过系统 API 看「信号」">https://sustyuxiao.github.io/2018/04/08/2018-04-08/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/03/2018-04-03/" rel="next" title="浅析 STL 中「set」及「map」">
+                <i class="fa fa-chevron-left"></i> 浅析 STL 中「set」及「map」
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png"
+                alt="张鹏霄" />
+            
+              <p class="site-author-name" itemprop="name">张鹏霄</p>
+              <p class="site-description motion-element" itemprop="description">https://sustyuxiao.github.io</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/SUSTYuxiao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zpx736312737@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#信号的基本概念"><span class="nav-number">1.</span> <span class="nav-text">信号的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信号的处理流程"><span class="nav-number">2.</span> <span class="nav-text">信号的处理流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Block-amp-Pending-amp-handler"><span class="nav-number">3.</span> <span class="nav-text">Block &amp; Pending &amp; handler</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信号-API"><span class="nav-number">4.</span> <span class="nav-text">信号 API</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#阻塞-ctrl-C"><span class="nav-number">4.0.0.1.</span> <span class="nav-text">阻塞 ctrl C</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#捕捉信号并自定义处理函数"><span class="nav-number">4.0.0.2.</span> <span class="nav-text">捕捉信号并自定义处理函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#模拟sleep"><span class="nav-number">4.0.0.3.</span> <span class="nav-text">模拟sleep</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#可-不可重入函数与volatile"><span class="nav-number">4.0.0.4.</span> <span class="nav-text">可/不可重入函数与volatile</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#竞态条件与抵达间隙"><span class="nav-number">4.0.0.5.</span> <span class="nav-text">竞态条件与抵达间隙</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#利用SIGCHLD信号清理僵尸进程"><span class="nav-number">4.0.0.6.</span> <span class="nav-text">利用SIGCHLD信号清理僵尸进程</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+  
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+  </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张鹏霄</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://pages.github.com">GitHub Pages</a></div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
