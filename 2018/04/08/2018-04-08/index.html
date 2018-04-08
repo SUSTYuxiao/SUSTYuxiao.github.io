@@ -79,19 +79,19 @@
 
 
 
-<meta name="description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」 信号的基本概念信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。 信号分为  标准信号（同时发送多个同一信号时可能发生丢失） 实时信号（通过队列实现信号的稳定处理）  本文主要研究1-31号（非实时信号）来理解信号">
+<meta name="description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」">
 <meta property="og:type" content="article">
 <meta property="og:title" content="透过系统 API 看「信号」">
 <meta property="og:url" content="https://sustyuxiao.github.io/2018/04/08/2018-04-08/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」 信号的基本概念信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。 信号分为  标准信号（同时发送多个同一信号时可能发生丢失） 实时信号（通过队列实现信号的稳定处理）  本文主要研究1-31号（非实时信号）来理解信号">
+<meta property="og:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable1.jpg">
-<meta property="og:updated_time" content="2018-04-08T17:53:59.000Z">
+<meta property="og:updated_time" content="2018-04-08T17:58:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="透过系统 API 看「信号」">
-<meta name="twitter:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」 信号的基本概念信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。 信号分为  标准信号（同时发送多个同一信号时可能发生丢失） 实时信号（通过队列实现信号的稳定处理）  本文主要研究1-31号（非实时信号）来理解信号">
+<meta name="twitter:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」">
 <meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg">
 
 
@@ -337,7 +337,7 @@
 
       
         <p>「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。</p>
-<p>本文通过对系统相关API的使用来深度理解系统编程的「信号」</p>
+<p>本文通过对系统相关API的使用来深度理解系统编程的「信号」<br><a id="more"></a></p>
 <h2 id="信号的基本概念"><a href="#信号的基本概念" class="headerlink" title="信号的基本概念"></a>信号的基本概念</h2><p>信号是一种用来提醒进程一个事件已经发生的异步的通知机制，可以由进程发送，也可以由内核发送。</p>
 <p>信号分为</p>
 <ul>
