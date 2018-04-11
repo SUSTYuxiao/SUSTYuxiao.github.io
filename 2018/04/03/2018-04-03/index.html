@@ -79,17 +79,17 @@
 
 
 
-<meta name="description" content="本文通过 http://www.cplusplus.com/reference 的 set&amp;amp;map API 介绍 set&amp;amp;map有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文">
+<meta name="description" content="set&amp;amp;map高频出现在笔试题&amp;amp;竞赛中，记录用法如下 本文通过 http://www.cplusplus.com/reference 的 set&amp;amp;map API 介绍 set&amp;amp;map有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文">
 <meta property="og:type" content="article">
-<meta property="og:title" content="浅析 STL 中「set」及「map」">
+<meta property="og:title" content="「set」及「map」使用指北">
 <meta property="og:url" content="https://sustyuxiao.github.io/2018/04/03/2018-04-03/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="本文通过 http://www.cplusplus.com/reference 的 set&amp;amp;map API 介绍 set&amp;amp;map有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文">
+<meta property="og:description" content="set&amp;amp;map高频出现在笔试题&amp;amp;竞赛中，记录用法如下 本文通过 http://www.cplusplus.com/reference 的 set&amp;amp;map API 介绍 set&amp;amp;map有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-04-08T18:02:07.000Z">
+<meta property="og:updated_time" content="2018-04-10T13:40:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="浅析 STL 中「set」及「map」">
-<meta name="twitter:description" content="本文通过 http://www.cplusplus.com/reference 的 set&amp;amp;map API 介绍 set&amp;amp;map有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文">
+<meta name="twitter:title" content="「set」及「map」使用指北">
+<meta name="twitter:description" content="set&amp;amp;map高频出现在笔试题&amp;amp;竞赛中，记录用法如下 本文通过 http://www.cplusplus.com/reference 的 set&amp;amp;map API 介绍 set&amp;amp;map有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文">
 
 
 
@@ -125,7 +125,7 @@
 
 
 
-  <title>浅析 STL 中「set」及「map」 | zpx's HomePage</title>
+  <title>「set」及「map」使用指北 | zpx's HomePage</title>
   
 
 
@@ -261,7 +261,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">浅析 STL 中「set」及「map」</h1>
+          <h1 class="post-title" itemprop="name headline">「set」及「map」使用指北</h1>
         
 
         <div class="post-meta">
@@ -333,12 +333,39 @@
       
 
       
-        <p>本文通过 <a href="http://www.cplusplus.com/reference" target="_blank" rel="noopener">http://www.cplusplus.com/reference</a> 的 set&amp;map API 介绍 set&amp;map<br>有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文<br><a id="more"></a></p>
-<h2 id="STL-中「set」及「map」的使用"><a href="#STL-中「set」及「map」的使用" class="headerlink" title="STL 中「set」及「map」的使用"></a>STL 中「set」及「map」的使用</h2><h3 id="为什么要用-set-amp-map"><a href="#为什么要用-set-amp-map" class="headerlink" title="为什么要用 set&amp;map"></a>为什么要用 set&amp;map</h3><p>set&amp;map 基于红黑树构成，借助其近似平衡树的特性，查询结构中元素的算法复杂度仅为 logN</p>
+        <p>set&amp;map高频出现在笔试题&amp;竞赛中，记录用法如下</p>
+<p>本文通过 <a href="http://www.cplusplus.com/reference" target="_blank" rel="noopener">http://www.cplusplus.com/reference</a> 的 set&amp;map API 介绍 set&amp;map<br>有关红黑树的更多知识，请通过「任意门」跳转到我的另一篇博文</p>
+<a id="more"></a>
+<h2 id="为什么要用-set-amp-map"><a href="#为什么要用-set-amp-map" class="headerlink" title="为什么要用 set&amp;map"></a>为什么要用 set&amp;map</h2><p>set&amp;map 基于红黑树构成，借助其近似平衡树的特性，查询结构中元素的算法复杂度仅为 logN</p>
 <p>以 AVL树 为例，其完全平衡树结构使得 $1073741824(2^{30})$ 个数字中查找一个数字最多只需要 <strong>30</strong> 次。</p>
 <p>因此，基于红黑树封装的 set&amp;map 广泛运用于比赛与实际项目中。</p>
-<h3 id="set-amp-multiset"><a href="#set-amp-multiset" class="headerlink" title="set&amp;multiset"></a>set&amp;multiset</h3><p>//TODO</p>
-
+<h3 id="set-map结构上区别"><a href="#set-map结构上区别" class="headerlink" title="set/map结构上区别"></a>set/map结构上区别</h3><ul>
+<li>map 基于红黑树（K-V结构）实现，封装了插入、迭代器等接口</li>
+<li>set 基于红黑树实现，但可以看作抛弃了 value ，只存储 key</li>
+</ul>
+<p>实际源码通过<code>rbtree&lt;key, key&gt;</code>实现set、<code>rbtree&lt;key, pair&lt;key, value&gt;&gt;</code>实现map</p>
+<h2 id="set-增删查改"><a href="#set-增删查改" class="headerlink" title="set 增删查改"></a>set 增删查改</h2><h3 id="set-插入元素"><a href="#set-插入元素" class="headerlink" title="set 插入元素"></a>set 插入元素</h3><ol>
+<li><p>直接插值</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原型</span></span><br><span class="line">pair&lt;iterator,<span class="keyword">bool</span>&gt; insert (<span class="keyword">const</span> value_type&amp; val);</span><br><span class="line"></span><br><span class="line"><span class="comment">//实例</span></span><br><span class="line"><span class="built_in">set</span>&lt;<span class="keyword">int</span>&gt; s;</span><br><span class="line">s.insert(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p> 其中：</p>
+<ul>
+<li>返回值中pair::first指向插入的元素的迭代器</li>
+<li>当该元素是新插入的值时（插入前set没有这个值），返回值中pair::second中的布尔值为true</li>
+</ul>
+</li>
+<li><p>通过迭代器插值</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原型</span></span><br><span class="line"><span class="function">iterator <span class="title">insert</span> <span class="params">(iterator position, <span class="keyword">const</span> value_type&amp; val)</span></span>; <span class="comment">//with hint (2)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//实例</span></span><br><span class="line"><span class="built_in">set</span>&lt;<span class="keyword">int</span>&gt; s;</span><br><span class="line"><span class="built_in">std</span>::pair&lt;<span class="built_in">std</span>::<span class="built_in">set</span>&lt;<span class="keyword">int</span>&gt;::iterator,<span class="keyword">bool</span>&gt; ret;</span><br><span class="line"></span><br><span class="line">ret = s.insert(<span class="number">1</span>);</span><br><span class="line">s.insert(ret,<span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<p> 其中：</p>
+<ul>
+<li>新的元素将会插入在原来迭代器的位置</li>
+<li>插入并不是强制插入（不是一定插入在选择的迭代器的位置），而是遵循给定的排序</li>
+</ul>
+</li>
+<li><p>插入两个迭代器中所有数据（泛型）</p>
+ <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原型</span></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">InputIterator</span>&gt; </span></span><br><span class="line"><span class="class"><span class="title">void</span> <span class="title">insert</span> (<span class="title">InputIterator</span> <span class="title">first</span>, <span class="title">InputIterator</span> <span class="title">last</span>);</span> <span class="comment">//range (3)</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="set-amp-multiset"><a href="#set-amp-multiset" class="headerlink" title="set&amp;multiset"></a>set&amp;multiset</h3><h3 id="map-amp-multimap"><a href="#map-amp-multimap" class="headerlink" title="map&amp;multimap"></a>map&amp;multimap</h3>
       
     </div>
     
@@ -358,7 +385,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://sustyuxiao.github.io/2018/04/03/2018-04-03/" title="浅析 STL 中「set」及「map」">https://sustyuxiao.github.io/2018/04/03/2018-04-03/</a>
+    <a href="https://sustyuxiao.github.io/2018/04/03/2018-04-03/" title="「set」及「map」使用指北">https://sustyuxiao.github.io/2018/04/03/2018-04-03/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -473,7 +500,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -535,7 +562,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#STL-中「set」及「map」的使用"><span class="nav-number">1.</span> <span class="nav-text">STL 中「set」及「map」的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要用-set-amp-map"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要用 set&amp;map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#set-amp-multiset"><span class="nav-number">1.2.</span> <span class="nav-text">set&amp;multiset</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要用-set-amp-map"><span class="nav-number">1.</span> <span class="nav-text">为什么要用 set&amp;map</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set-map结构上区别"><span class="nav-number">1.1.</span> <span class="nav-text">set/map结构上区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#set-增删查改"><span class="nav-number">2.</span> <span class="nav-text">set 增删查改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set-插入元素"><span class="nav-number">2.1.</span> <span class="nav-text">set 插入元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#set-amp-multiset"><span class="nav-number">2.2.</span> <span class="nav-text">set&amp;multiset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-amp-multimap"><span class="nav-number">2.3.</span> <span class="nav-text">map&amp;multimap</span></a></li></ol></li></ol></div>
             
 
           </div>
