@@ -91,7 +91,7 @@
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table4.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_table3.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_03/virtual_class_table.jpg">
-<meta property="og:updated_time" content="2018-04-03T09:33:39.000Z">
+<meta property="og:updated_time" content="2018-04-26T13:21:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C++ 多态对象模型&#x2F;虚继承对象模型">
 <meta name="twitter:description" content="c++为了实现多态引入虚表的概念。为了解决多继承问题引入虚基表的概念。本文通过介绍对象在内存中的分布简析 c++的多态/虚继承 对象模型">
@@ -350,10 +350,26 @@
 </li>
 <li><p>动态联编<br>指针/引用 + 虚函数<br>（将在虚表中寻找函数的函数地址）</p>
 </li>
-<li><p>多态<br>虚函数的重写 + 动态联编<br>多态的目的是使用 父类的指针/引用，指向父类时访问父类方法，指向子类时访问子类方法。</p>
+<li><p>多态</p>
+<ul>
+<li>动态多态（即本文所述多态）<ul>
+<li>虚函数的重写 + 动态联编</li>
+<li>多态的目的是使用 父类的指针/引用，指向父类时访问父类方法，指向子类时访问子类方法。</li>
+</ul>
+</li>
+<li>静态多态（函数重载）<ul>
+<li>函数同名不同參 </li>
+<li>（依据参数在编译时生成不同的函数签名，解决二义性）</li>
+</ul>
+</li>
+</ul>
 </li>
 <li><p>虚函数表(虚表），解决多态问题<br>当成员函数被声明为虚函数时，程序运行时不直接调用代码段，而是生成「虚函数表」，程序通过虚函数表找到需要执行的代码。</p>
 </li>
+</ul>
+<p>其中，本文提到的多态指的是动态多态，</p>
+<ul>
+<li>动态多态（本文所述）</li>
 </ul>
 <h2 id="虚函数表对象模型-多态的实现"><a href="#虚函数表对象模型-多态的实现" class="headerlink" title="虚函数表对象模型 - 多态的实现"></a>虚函数表对象模型 - 多态的实现</h2><p>通过虚函数表的对象模型，结合 父类的指针/引用，可以实现 指向父类时访问父类方法，指向子类时访问子类方法。</p>
 <p>对如下代码，A 是父类（基类），B 是子类（派生类）</p>
@@ -528,7 +544,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

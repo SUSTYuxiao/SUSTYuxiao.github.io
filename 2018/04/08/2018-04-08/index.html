@@ -88,7 +88,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable1.jpg">
-<meta property="og:updated_time" content="2018-04-10T07:47:21.000Z">
+<meta property="og:updated_time" content="2018-04-13T09:21:21.886Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深度理解信号：透过系统 API 看「信号」">
 <meta name="twitter:description" content="「信号」是操作系统中重要的进程间通信方式，熟悉信号的处理机制对学习操作系统十分重要。 本文通过对系统相关API的使用来深度理解系统编程的「信号」">
@@ -353,7 +353,8 @@
 <li>阻塞：标记信号暂时不应被处理（”人为暂停某个信号的处理“）</li>
 </ul>
 <p>一般来讲，信号产生后首先会进入未决状态。在合适的时机才会执行对应的默认方法(抵达）。<br>当一个信号进入阻塞态后，在阻塞状态被修改前永远不会执行对应的方法。</p>
-<p>信号从产生到抵达总是伴随着 用户态与内核态的相互转换（高权限的任务由内核完成）<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg" alt=""><br>一般情况下的未决（没有被阻塞），正是表示信号产生「但内核还未转换到用户态」时的状态。</p>
+<p>信号从产生到抵达总是伴随着 用户态与内核态的相互转换（高权限的任务由内核完成）</p>
+<p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable2.jpg" width="80%" height="80%"><br>一般情况下的未决（没有被阻塞），正是表示信号产生「但内核还未转换到用户态」时的状态。</p>
 <h2 id="Block-amp-Pending-amp-handler"><a href="#Block-amp-Pending-amp-handler" class="headerlink" title="Block &amp; Pending &amp; handler"></a>Block &amp; Pending &amp; handler</h2><p>上述状态的改变体现在 PCB 中时，标记以 0、1 表示，如下图</p>
 <p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/signTable1.jpg" alt=""></p>
 <p>上图说明了信号典型的三种情况：</p>
@@ -547,6 +548,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/04/27/2018-04-27/" rel="prev" title="我眼中的面向对象">
+                我眼中的面向对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -626,7 +631,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">10</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
