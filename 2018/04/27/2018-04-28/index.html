@@ -79,17 +79,21 @@
 
 
 
-<meta name="description" content="Static-Huffman静态哈夫曼压缩文件的 C++ 实现压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤">
+<meta name="description" content="互联网刚起步时，ISO标准化了OSI协议OSI根据互联网的功能，OSI分为7层，通过分层，复杂的网络协议更加简单化由于各种原因，OSI没有被实现，取而代之的是TCP/IP协议族，OSI协议称为OSI参考模型 TCP/IP协议族是为了互联网通信而开发，参考OSI模型，TCP/IP也有对应的分层模型">
 <meta property="og:type" content="article">
-<meta property="og:title" content="静态哈夫曼压缩文件的 C++ 实现">
-<meta property="og:url" content="https://sustyuxiao.github.io/2018/03/19/Static-Huffman/index.html">
+<meta property="og:title" content="TCP&#x2F;IP分层模型与数据的封装、分用">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/04/27/2018-04-28/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="Static-Huffman静态哈夫曼压缩文件的 C++ 实现压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤">
+<meta property="og:description" content="互联网刚起步时，ISO标准化了OSI协议OSI根据互联网的功能，OSI分为7层，通过分层，复杂的网络协议更加简单化由于各种原因，OSI没有被实现，取而代之的是TCP/IP协议族，OSI协议称为OSI参考模型 TCP/IP协议族是为了互联网通信而开发，参考OSI模型，TCP/IP也有对应的分层模型">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-22T02:27:43.000Z">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP1.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP2.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP3.jpg">
+<meta property="og:updated_time" content="2018-04-28T12:05:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="静态哈夫曼压缩文件的 C++ 实现">
-<meta name="twitter:description" content="Static-Huffman静态哈夫曼压缩文件的 C++ 实现压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤">
+<meta name="twitter:title" content="TCP&#x2F;IP分层模型与数据的封装、分用">
+<meta name="twitter:description" content="互联网刚起步时，ISO标准化了OSI协议OSI根据互联网的功能，OSI分为7层，通过分层，复杂的网络协议更加简单化由于各种原因，OSI没有被实现，取而代之的是TCP/IP协议族，OSI协议称为OSI参考模型 TCP/IP协议族是为了互联网通信而开发，参考OSI模型，TCP/IP也有对应的分层模型">
+<meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP1.jpg">
 
 
 
@@ -119,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="https://sustyuxiao.github.io/2018/03/19/Static-Huffman/"/>
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/04/27/2018-04-28/"/>
 
 
 
 
 
-  <title>静态哈夫曼压缩文件的 C++ 实现 | zpx's HomePage</title>
+  <title>TCP/IP分层模型与数据的封装、分用 | zpx's HomePage</title>
   
 
 
@@ -244,7 +248,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/03/19/Static-Huffman/">
+    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/04/27/2018-04-28/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张鹏霄">
@@ -261,7 +265,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">静态哈夫曼压缩文件的 C++ 实现</h1>
+          <h1 class="post-title" itemprop="name headline">TCP/IP分层模型与数据的封装、分用</h1>
         
 
         <div class="post-meta">
@@ -273,8 +277,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-19T00:00:00+08:00">
-                2018-03-19
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T00:00:00+08:00">
+                2018-04-27
               </time>
             
 
@@ -296,8 +300,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/GitHub-project/" itemprop="url" rel="index">
-                    <span itemprop="name">GitHub project</span>
+                  <a href="/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
                   </a>
                 </span>
 
@@ -333,37 +337,61 @@
       
 
       
-        <h2 id="Static-Huffman"><a href="#Static-Huffman" class="headerlink" title="Static-Huffman"></a>Static-Huffman</h2><h3 id="静态哈夫曼压缩文件的-C-实现"><a href="#静态哈夫曼压缩文件的-C-实现" class="headerlink" title="静态哈夫曼压缩文件的 C++ 实现"></a>静态哈夫曼压缩文件的 C++ 实现</h3><h5 id="压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤"><a href="#压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤" class="headerlink" title="压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤"></a>压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤</h5><a id="more"></a>
-<ol>
-<li>完整扫描文本，遍历所有字符以统计字符权重</li>
-<li>根据字符权重建立静态哈夫曼树</li>
-<li>保存权重信息到输出文件（解压重建哈夫曼树需要）</li>
-<li>通过哈夫曼树生成各字符的哈夫曼编码</li>
-<li>根据哈夫曼编码对原文件字符转换并以 bit 为单位输出</li>
-</ol>
-<h5 id="解压：使用对已经压缩到文件解压缩，需要经过如下步骤"><a href="#解压：使用对已经压缩到文件解压缩，需要经过如下步骤" class="headerlink" title="解压：使用对已经压缩到文件解压缩，需要经过如下步骤"></a>解压：使用对已经压缩到文件解压缩，需要经过如下步骤</h5><ol>
-<li>扫描文本直至遇到标志位，以读取权重信息</li>
-<li>根据字符权重重新建立静态哈夫曼树</li>
-<li>读取哈夫曼编码并通过哈夫曼树还原字符</li>
-<li>输出还原字符到解压文件</li>
-</ol>
-<hr>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h5 id="重难点解决方案"><a href="#重难点解决方案" class="headerlink" title="重难点解决方案"></a>重难点解决方案</h5><ul>
-<li>使用精简后的结构体的形式，通过「二进制写」保存权重信息，以避免歧义、特殊字符处理的问题</li>
-<li>使用权值为 0 的上述结构体为权值信息结束标志位</li>
-<li>利用哈夫曼树特性，通过重建的哈夫曼树根节点权值的到总字符数，解决最后字节可能存在的冗余问题</li>
+        <p>互联网刚起步时，ISO标准化了OSI协议<br>OSI根据互联网的功能，OSI分为7层，通过分层，复杂的网络协议更加简单化<br>由于各种原因，OSI没有被实现，取而代之的是TCP/IP协议族，OSI协议称为OSI参考模型</p>
+<p>TCP/IP协议族是为了互联网通信而开发，参考OSI模型，TCP/IP也有对应的分层模型</p>
+<a id="more"></a>
+<p>TCI/IP模型分层包括</p>
+<ul>
+<li>应用层（DNS、HTTP、SSH等）</li>
+<li>传输层（TCP、UDP、UDP-Lite等）</li>
+<li>网络层（IP、ICMP、ARP等）</li>
+<li>链路层</li>
+<li>物理层</li>
 </ul>
-<h5 id="项目特点"><a href="#项目特点" class="headerlink" title="项目特点"></a>项目特点</h5><ul>
-<li>堆与哈夫曼树使用模版，泛型编程</li>
-<li>注释丰富</li>
+<p>图解TCP/IP中有一图如下<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP1.jpg" height="70%" width="70%"></p>
+<p>传输层及其以下的机制由内核提供，应用层由用户进程提供<br>通过对应的 socket API 我们可以编写自己的应用程序</p>
+<h3 id="封装与分用"><a href="#封装与分用" class="headerlink" title="封装与分用"></a>封装与分用</h3><p>主机间通信通过各个协议层协同完成</p>
+<h5 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h5><p>发送端主机的数据总是由进程在应用层交给传输层<br>这个数据在传输层被称作「段」</p>
+<p>传输层将段加上传输层的部首，发给网络层<br>网络层接到的数据被称作「数据报」（数据报=传输层部首+段）</p>
+<p>网络层将段加上网络层的部首，发给链路层<br>链路层接到的数据被称作「帧」（帧=网络层部首+数据报）</p>
+<p>这样一层一层对数据添加部首的过程称作数据的封装<br>到达目的主机后，即可将部首中的“上层协议字段”交给“上层协议”进行处理</p>
+<p>图解TCP/IP中有一图如下<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP2.jpg" height="70%" width="70%"></p>
+<h5 id="分用"><a href="#分用" class="headerlink" title="分用"></a>分用</h5><p>网络<br>接受端主机在链路层收到帧时，检查部首（假设地址匹配）<br>通过封装阶段得到的信息，链路层添加合适的部首信息<br>网络层接到数据后，根据部首信息会选择是由IP协议处理、ARP协议处理还是其他协议去处理<br>这样，上层协议根据部首信息对数据分类处理的过程叫做分用</p>
+<p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP3.jpg" height="80%" width="80%"></p>
+<h3 id="分用举例"><a href="#分用举例" class="headerlink" title="分用举例"></a>分用举例</h3><p>以下以局域网内「源主机与目的主机间通信在链路层的处理过程」为例</p>
+<p>#####部首与数据包</p>
+<table><br><tr><br>  <th colspan="3">报头</th><br>  <th>报文</th><br>  <th>校验位</th><br></tr><br><tr><br>  <td>目的地址(6byte)</td><br>  <td>源地址(6byte)</td><br>  <td>类型(2byte)</td><br>  <td>数据(46~1500byte)</td><br>  <td>校验位(4byte)</td><br></tr><br></table>
+
+<ul>
+<li>地址：MAC地址</li>
+<li>类型<ul>
+<li>值为0800:此时数据包是「IP数据报」</li>
+<li>值为0806:此时数据包是「ARP请求/应答」</li>
+<li>值为0835:此时数据包是「RARP请求/应答」</li>
 </ul>
-<h5 id="静态哈夫曼缺点"><a href="#静态哈夫曼缺点" class="headerlink" title="静态哈夫曼缺点"></a>静态哈夫曼缺点</h5><ul>
-<li>两次扫描文本，影响性能</li>
-<li>需要保存权重信息到文本</li>
+</li>
 </ul>
-<p>The project’s URL <a href="https://github.com/SUSTYuxiao/Static-Huffman" target="_blank" rel="noopener">https://github.com/SUSTYuxiao/Static-Huffman</a></p>
-<hr>
-<p> 2018.03.19 By 张鹏霄 zpx736312737@126.com | Others in Blog <a href="https://sustyuxiao.github.io">https://sustyuxiao.github.io</a></p>
+<p>值得强调的是：后两种类型长度恒为28字节，因此数据包后面要补位（18byte）</p>
+<h5 id="分用过程"><a href="#分用过程" class="headerlink" title="分用过程"></a>分用过程</h5><p>需要注意的是：<br>网关内的数据传输是面向无连接的，即信息不是点对点传输的<br>网关内所有主机都会收到数据，根据各层判断部首判断自己是否是目的主机</p>
+<h6 id="第一种情况：源主机知道目的主机的IP地址，但不知道MAC地址"><a href="#第一种情况：源主机知道目的主机的IP地址，但不知道MAC地址" class="headerlink" title="第一种情况：源主机知道目的主机的IP地址，但不知道MAC地址"></a>第一种情况：源主机知道目的主机的IP地址，但不知道MAC地址</h6><p>则源主机在链路层封装的部首中信息中</p>
+<ul>
+<li>类型：0806</li>
+<li>目的地址：全为1（广播地址）</li>
+</ul>
+<p>经过物理层信息的传递，每个主机都会在链路层看到该数据<br>主机发现目的地址是广播地址不会直接丢弃<br>发现类型为ARP请求类型，则将数据传递给网络层由ARP协议处理<br>此时又会有两种情况</p>
+<ul>
+<li>网络层发现IP地址与本机不匹配，丢弃</li>
+<li>网络层发现IP地址与本机匹配，发送ARP应答包传回源主机</li>
+</ul>
+<h6 id="第二种情况：源主机知道目的主机的MAC地址"><a href="#第二种情况：源主机知道目的主机的MAC地址" class="headerlink" title="第二种情况：源主机知道目的主机的MAC地址"></a>第二种情况：源主机知道目的主机的MAC地址</h6><p>部首中「类型」值为0800，「目的地址」值为对应MAC地址<br>目的主机接到信息后，地址匹配，则将数据传递给网络层<br>非目的主机的链路层接到信息后，发现目的地址（MAC）与本机MAC地址不一致，丢弃</p>
+<p>RARP不再赘述<br>以上过程即为网络中分用的过程</p>
+<p>则源主机在链路层封装的部首中信息中</p>
+<ul>
+<li>类型：0800</li>
+<li>目的地址：对应的MAC地址</li>
+</ul>
+<p>经过物理层信息的传递，每个主机都会在链路层看到该数据<br>非目的主机发现目的地址与自身不匹配会直接丢弃<br>目的主机继续解析，发现类型为IP数据报，则将数据传递给网络层由IP协议处理</p>
+<p>这样，根据部首信息目的主机做不同处理，即为分用</p>
 
       
     </div>
@@ -384,7 +412,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://sustyuxiao.github.io/2018/03/19/Static-Huffman/" title="静态哈夫曼压缩文件的 C++ 实现">https://sustyuxiao.github.io/2018/03/19/Static-Huffman/</a>
+    <a href="https://sustyuxiao.github.io/2018/04/27/2018-04-28/" title="TCP/IP分层模型与数据的封装、分用">https://sustyuxiao.github.io/2018/04/27/2018-04-28/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -406,8 +434,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/09/2018-03-09/" rel="next" title="C++ 多态对象模型/虚继承对象模型">
-                <i class="fa fa-chevron-left"></i> C++ 多态对象模型/虚继承对象模型
+              <a href="/2018/04/27/2018-04-27/" rel="next" title="我眼中的面向对象">
+                <i class="fa fa-chevron-left"></i> 我眼中的面向对象
               </a>
             
           </div>
@@ -415,10 +443,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/03/2018-04-03/" rel="prev" title="「set」及「map」使用指北">
-                「set」及「map」使用指北 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -561,7 +585,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Static-Huffman"><span class="nav-number">1.</span> <span class="nav-text">Static-Huffman</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#静态哈夫曼压缩文件的-C-实现"><span class="nav-number">1.1.</span> <span class="nav-text">静态哈夫曼压缩文件的 C++ 实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">压缩：使用静态哈夫曼编码进行文件压缩，需要经过如下步骤</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#解压：使用对已经压缩到文件解压缩，需要经过如下步骤"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">解压：使用对已经压缩到文件解压缩，需要经过如下步骤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">1.2.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#重难点解决方案"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">重难点解决方案</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#项目特点"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">项目特点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#静态哈夫曼缺点"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">静态哈夫曼缺点</span></a></li></ol></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#封装与分用"><span class="nav-number">1.</span> <span class="nav-text">封装与分用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#封装"><span class="nav-number">1.0.1.</span> <span class="nav-text">封装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#分用"><span class="nav-number">1.0.2.</span> <span class="nav-text">分用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分用举例"><span class="nav-number">2.</span> <span class="nav-text">分用举例</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#分用过程"><span class="nav-number">2.0.1.</span> <span class="nav-text">分用过程</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#第一种情况：源主机知道目的主机的IP地址，但不知道MAC地址"><span class="nav-number">2.0.1.1.</span> <span class="nav-text">第一种情况：源主机知道目的主机的IP地址，但不知道MAC地址</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#第二种情况：源主机知道目的主机的MAC地址"><span class="nav-number">2.0.1.2.</span> <span class="nav-text">第二种情况：源主机知道目的主机的MAC地址</span></a></li></ol></li></ol></li></ol></li></ol></div>
             
 
           </div>
