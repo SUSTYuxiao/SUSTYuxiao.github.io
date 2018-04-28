@@ -89,7 +89,7 @@
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP1.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP2.jpg">
 <meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP3.jpg">
-<meta property="og:updated_time" content="2018-04-28T12:29:35.000Z">
+<meta property="og:updated_time" content="2018-04-28T13:09:53.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TCP&#x2F;IP分层模型与数据的封装、分用">
 <meta name="twitter:description" content="互联网刚起步时，ISO标准化了OSI协议OSI根据互联网的功能，OSI分为7层，通过分层，复杂的网络协议更加简单化由于各种原因，OSI没有被实现，取而代之的是TCP/IP协议族，OSI协议称为OSI参考模型 TCP/IP协议族是为了互联网通信而开发，参考OSI模型，TCP/IP也有对应的分层模型">
@@ -351,12 +351,16 @@
 <p>图解TCP/IP中有一图如下<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP1.jpg" height="70%" width="70%"></p>
 <p>传输层及其以下的机制由内核提供，应用层由用户进程提供<br>通过对应的 socket API 我们可以编写自己的应用程序</p>
 <h2 id="封装与分用"><a href="#封装与分用" class="headerlink" title="封装与分用"></a>封装与分用</h2><p>主机间通信通过各个协议层协同完成</p>
-<h3 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h3><p>发送端主机的数据总是由进程在应用层交给传输层<br>这个数据在传输层被称作「段」</p>
-<p>传输层将段加上传输层的部首，发给网络层<br>网络层接到的数据被称作「数据报」（数据报=传输层部首+段）</p>
-<p>网络层将段加上网络层的部首，发给链路层<br>链路层接到的数据被称作「帧」（帧=网络层部首+数据报）</p>
-<p>这样一层一层对数据添加部首的过程称作数据的封装<br>到达目的主机后，即可将部首中的“上层协议字段”交给“上层协议”进行处理</p>
+<h3 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h3><p>源主机发送信息到目的主机，数据是从应用层流向物理层，到达目的主机后又流向应用层的<br>在从一层流向下一层的过程中，上层会根据协议添加自己的标志信息<br>这样一层一层对数据添加部首的过程称作数据的封装<br>到达目的主机后，即可将部首中的“上层协议字段”交给“上层协议”进行处理</p>
 <p>图解TCP/IP中有一图如下<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP2.jpg" height="70%" width="70%"></p>
-<h3 id="分用"><a href="#分用" class="headerlink" title="分用"></a>分用</h3><p>网络<br>接受端主机在链路层收到帧时，检查部首（假设地址匹配）<br>通过封装阶段得到的信息，链路层添加合适的部首信息<br>网络层接到数据后，根据部首信息会选择是由IP协议处理、ARP协议处理还是其他协议去处理<br>这样，上层协议根据部首信息对数据分类处理的过程叫做分用</p>
+<p>其中，数据在不同层有不同的叫法</p>
+<ul>
+<li>传输层：段 段=传输层部首信息+应用层数据</li>
+<li>网络层：数据报=网络层部首信息+段（来自传输层的数据）</li>
+<li>链路层：帧=链路层部首信息+数据报（来自网络层的数据）</li>
+</ul>
+<h3 id="分用"><a href="#分用" class="headerlink" title="分用"></a>分用</h3><p>以链路层为例<br>目的主机在网络层在收到链路层传上来的帧时，分析帧部首<br>帧的部首中有一个标志位为「类型」<br>类型的值说明了帧的数据是IP数据报、ARP数据报还是RARP数据报<br>根据该标志位，网络层就知道使用哪种协议去处理帧</p>
+<p>这样的上层协议根据部首信息对数据分类处理的过程叫做分用</p>
 <p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_04/TCPIP3.jpg" height="80%" width="80%"></p>
 <h2 id="分用举例"><a href="#分用举例" class="headerlink" title="分用举例"></a>分用举例</h2><p>以下以局域网内「源主机与目的主机间通信在链路层的处理过程」为例</p>
 <h3 id="部首与数据包"><a href="#部首与数据包" class="headerlink" title="部首与数据包"></a>部首与数据包</h3><div><table><tr><th colspan="3">报头</th><th>报文</th><th>校验位</th></tr><tr><td>目的地址(6byte)</td><td>源地址(6byte)</td><td>类型(2byte)</td><td>数据(46~1500byte)</td><td>校验位(4byte)</td></tr></table></div>
@@ -365,8 +369,8 @@
 <li>地址：MAC地址</li>
 <li>类型<ul>
 <li>值为0800:此时数据包是「IP数据报」</li>
-<li>值为0806:此时数据包是「ARP请求/应答」</li>
-<li>值为0835:此时数据包是「RARP请求/应答」</li>
+<li>值为0806:此时数据包是「ARP数据报」</li>
+<li>值为0835:此时数据包是「RARP数据报」</li>
 </ul>
 </li>
 </ul>
