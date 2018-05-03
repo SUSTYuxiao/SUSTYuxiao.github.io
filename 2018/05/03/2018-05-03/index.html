@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="zpx&#39;s HomePage">
 <meta property="og:description" content="总结一下线程的中同步与互斥的概念通过互斥锁实现一个生产消费模型同时辨析读写锁、自旋锁、RCU锁">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-03T09:17:26.000Z">
+<meta property="og:updated_time" content="2018-05-03T09:26:54.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="同步、互斥、读写锁、自旋锁、RCU锁">
 <meta name="twitter:description" content="总结一下线程的中同步与互斥的概念通过互斥锁实现一个生产消费模型同时辨析读写锁、自旋锁、RCU锁">
@@ -451,8 +451,8 @@ _t *restrict attr);</code><ul>
 <p>限于篇幅，RCU深度剖析请移步另一篇博文（TODO）</p>
 <blockquote>
 <p>参考 <a href="https://blog.csdn.net/aganlengzi/article/details/51339519" target="_blank" rel="noopener">https://blog.csdn.net/aganlengzi/article/details/51339519</a></p>
-<h2 id="POSIX信号量"><a href="#POSIX信号量" class="headerlink" title="POSIX信号量"></a>POSIX信号量</h2><h3 id="与条件变量的对比"><a href="#与条件变量的对比" class="headerlink" title="与条件变量的对比"></a>与条件变量的对比</h3><p>条件变量总是与互斥锁一起使用的<br>那么换一个角度：</p>
 </blockquote>
+<h2 id="POSIX信号量"><a href="#POSIX信号量" class="headerlink" title="POSIX信号量"></a>POSIX信号量</h2><h3 id="与条件变量的对比"><a href="#与条件变量的对比" class="headerlink" title="与条件变量的对比"></a>与条件变量的对比</h3><p>条件变量总是与互斥锁一起使用的<br>那么换一个角度：</p>
 <ul>
 <li>条件变量和配合互斥锁时<ul>
 <li>互斥锁必须总是有给他上锁的线程解锁，信号量灵活的多</li>
