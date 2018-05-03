@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="总结一下线程的中同步与互斥的概念通过互斥锁实现一个生产消费模型同时辨析读写锁、自旋锁、RCU锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="同步、互斥、读写锁、自旋锁、RCU锁">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/05/03/2018-05-03/index.html">
+<meta property="og:site_name" content="zpx&#39;s HomePage">
+<meta property="og:description" content="总结一下线程的中同步与互斥的概念通过互斥锁实现一个生产消费模型同时辨析读写锁、自旋锁、RCU锁">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-05-03T09:17:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="同步、互斥、读写锁、自旋锁、RCU锁">
+<meta name="twitter:description" content="总结一下线程的中同步与互斥的概念通过互斥锁实现一个生产消费模型同时辨析读写锁、自旋锁、RCU锁">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/05/03/2018-05-03/"/>
+
+
+
+
+
+  <title>同步、互斥、读写锁、自旋锁、RCU锁 | zpx's HomePage</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-post-detail
+">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zpx's HomePage</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/05/03/2018-05-03/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张鹏霄">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zpx's HomePage">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">同步、互斥、读写锁、自旋锁、RCU锁</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-03T00:00:00+08:00">
+                2018-05-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/系统编程/" itemprop="url" rel="index">
+                    <span itemprop="name">系统编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"> </i>&nbsp;PV
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody" >
+
+      
+      
+
+      
+        <p>总结一下线程的中同步与互斥的概念<br>通过互斥锁实现一个生产消费模型<br>同时辨析读写锁、自旋锁、RCU锁</p>
+<a id="more"></a>
+<h2 id="临界资源引例：售票系统"><a href="#临界资源引例：售票系统" class="headerlink" title="临界资源引例：售票系统"></a>临界资源引例：售票系统</h2><p>设一个全局变量<code>int count = 100;</code>，表示当前售票系统的剩余的票的数量<br>有一个线程正在执行购票模块的代码<code>count--;</code></p>
+<p><code>count--</code>的执行分为三步</p>
+<ul>
+<li>cpu从内存中读取到当前余票（100）到cpu寄存器中</li>
+<li>cpu对该值进行减法操作</li>
+<li>cpu得到的结果（99）写入内存</li>
+</ul>
+<p>假设在第二步刚刚结束时，由于出现大量优先级更高的线程，内核保存当前线程上下文，该线程被挂起。</p>
+<p>第二个线程执行同样代码并正常退出，（读出100写入99）<br>第二个线程执行同样代码并正常退出，（读出99写入98）<br>此时切回第一个线程，继续执行下一步：写入99到内存</p>
+<p>经过上述操作，当前余票应为97，实为99，显然程序出现了错乱</p>
+<h2 id="加锁保护临界资源"><a href="#加锁保护临界资源" class="headerlink" title="加锁保护临界资源"></a>加锁保护临界资源</h2><p>引起上述问题的根本原因：减法操作不是原子性的</p>
+<blockquote>
+<p>原子性：最小粒度的特性。对于代码来说，要么全部执行，要么都不执行</p>
+</blockquote>
+<p>减法操作在执行中可能会被打断，是非原子性的，同时操作对象可能被打断期间被访问，最终造成混乱</p>
+<p>为了解决上述问题，我们可以要求涉及共享变量代码段执行前首先申请执行权限<br>申请成功后，在执行结束前不允许其它线程申请到执行权限</p>
+<p>这种解决方案即为：加一把「互斥锁」<br>同时：<br>对于<strong>每次仅允许一个进程访问的资源</strong>，我们称作临界资源<br>对于<strong>对临界资源进行操作的代码段</strong>，我们称作临界区</p>
+<p>在Linux的这种解决方案中，这把锁称为：互斥量<br>通过互斥量，避免临界区的并发操作，即实现了对临界资源的保护<br>上述概念即为所谓常听见的「同步」与「互斥」中的互斥</p>
+<p>互斥是为了保证线程的安全，同步则是在保证线程安全的基础上，协调各进程，使得访问临界资源具有顺序性<br>避免了线程不合理地频繁「申请锁」与「释放锁」带来的额外开销</p>
+<h3 id="互斥实例"><a href="#互斥实例" class="headerlink" title="互斥实例"></a>互斥实例</h3><p>通过引入互斥量，线程在执行临界区前需要申请锁，释放前其它线程的申请操作都会被阻塞，进而保证安全</p>
+<p>通过一段代码实例来认识这一概念</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sched.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> ticket = <span class="number">100</span>; <span class="comment">//全局变量：余票数</span></span><br><span class="line"><span class="keyword">pthread_mutex_t</span> mutex; <span class="comment">//全局变量：互斥锁（类似信号量操作，对锁的操作是原子性的）</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">buy</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *id = (<span class="keyword">char</span>*)arg;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">//申请锁</span></span><br><span class="line">        <span class="keyword">if</span> ( ticket &gt; <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"after %s brought ticket，least ticket:%d\n"</span>, id, ticket);</span><br><span class="line">            ticket--;</span><br><span class="line">            pthread_mutex_unlock(&amp;mutex); <span class="comment">//释放锁</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_unlock(&amp;mutex); <span class="comment">//释放锁</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">( <span class="keyword">void</span> )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">pthread_t</span> t1, t2, t3, t4;</span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>); <span class="comment">//初始化互斥量</span></span><br><span class="line">    </span><br><span class="line">    pthread_create(&amp;t1, <span class="literal">NULL</span>, buy, <span class="string">"thread 1"</span>);</span><br><span class="line">    pthread_create(&amp;t2, <span class="literal">NULL</span>, buy, <span class="string">"thread 2"</span>);</span><br><span class="line">    pthread_create(&amp;t3, <span class="literal">NULL</span>, buy, <span class="string">"thread 3"</span>);</span><br><span class="line">    pthread_create(&amp;t4, <span class="literal">NULL</span>, buy, <span class="string">"thread 4"</span>);</span><br><span class="line">   </span><br><span class="line">    pthread_join(t1, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(t2, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(t3, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(t4, <span class="literal">NULL</span>);</span><br><span class="line">    </span><br><span class="line">    pthread_mutex_destroy(&amp;mutex); <span class="comment">//销毁锁</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中</p>
+<ul>
+<li>互斥量的初始化<ul>
+<li>动态初始化<code>int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr
+_t *restrict attr);</code><ul>
+<li>mutex:要初始化的互斥量</li>
+<li>attr:NULL 一般使用NULL表示默认的配置</li>
+<li>成功返回0，失败返回错误码</li>
+</ul>
+</li>
+<li>静态初始化<code>pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER</code><ul>
+<li>需要静态初始化互斥量时使用，声明、定义、初始化一气呵成，不需要销毁</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>int pthread_mutex_lock(pthread_mutex_t *mutex);</code><ul>
+<li>加锁</li>
+<li>如果其它线程已经lock成功，则该线程陷入阻塞，等待解锁</li>
+</ul>
+</li>
+<li><code>int pthread_mutex_unlock(pthread_mutex_t *mutex);</code><ul>
+<li>解锁</li>
+</ul>
+</li>
+<li><code>int pthread_mutex_destroy(pthread_mutex_t *mutex);</code><ul>
+<li>销毁互斥量，不可销毁静态初始化的或者未解锁的互斥量</li>
+<li>要确保销毁后不再加锁</li>
+</ul>
+</li>
+</ul>
+<h3 id="互斥"><a href="#互斥" class="headerlink" title="互斥"></a>互斥</h3><p>在上述售票系统的例子中，如果我们加入第五个线程执行：在票数为0时设置票数为100<br>则会出现新的问题：</p>
+<ul>
+<li>在票数减至0前，线程5不断地检测票是否为0，产生不必要的开销</li>
+<li>线程5在临界区被切出去后发生饿死（一直没有切回来），1～4号线程不断地买票（失败）</li>
+</ul>
+<p>那么对于这个问题，则需要协同各个线程合理地按顺序执行，即线程的同步<br>在本例中，我们通过「条件变量」建立一种生产消费模型</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sched.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> ticket = <span class="number">100</span>; <span class="comment">//全局变量：余票数</span></span><br><span class="line"><span class="keyword">pthread_mutex_t</span> mutex; <span class="comment">//全局变量：互斥锁（类似信号量操作，对锁的操作是原子性的）</span></span><br><span class="line"><span class="keyword">pthread_cond_t</span> cond; <span class="comment">//全局变量：条件变量</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">product</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *id = (<span class="keyword">char</span>*)arg;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">//申请锁</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (ticket &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;lock); <span class="comment">//等待条件变量，</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"after %s produce ticket，least ticket:%d\n"</span>, id, ticket);</span><br><span class="line">        ticket = <span class="number">100</span>;</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex); <span class="comment">//释放锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">buy</span><span class="params">(<span class="keyword">void</span> *arg)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> *id = (<span class="keyword">char</span>*)arg;</span><br><span class="line">    <span class="keyword">while</span> ( <span class="number">1</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex); <span class="comment">//申请锁</span></span><br><span class="line">        <span class="keyword">if</span> ( ticket &gt; <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"after %s brought ticket，least ticket:%d\n"</span>, id, ticket);</span><br><span class="line">            ticket--;</span><br><span class="line">            pthread_mutex_unlock(&amp;mutex); <span class="comment">//释放锁</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_unlock(&amp;mutex); <span class="comment">//释放锁</span></span><br><span class="line">            pthread_cond_signal(&amp;cond); <span class="comment">//唤醒</span></span><br><span class="line">            usleep(<span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">( <span class="keyword">void</span> )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">pthread_t</span> buyer, producter;</span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>); <span class="comment">//初始化互斥量</span></span><br><span class="line">    pthread_cond_init(&amp;cond, <span class="literal">NULL</span>); <span class="comment">//初始化条件变量</span></span><br><span class="line">    </span><br><span class="line">    pthread_create(&amp;buyyer, <span class="literal">NULL</span>, buy, <span class="string">"thread 1"</span>);</span><br><span class="line">    pthread_create(&amp;buyyer, <span class="literal">NULL</span>, buy, <span class="string">"thread 2"</span>);</span><br><span class="line">    pthread_create(&amp;buyyer, <span class="literal">NULL</span>, buy, <span class="string">"thread 3"</span>);</span><br><span class="line">    pthread_create(&amp;buyyer, <span class="literal">NULL</span>, buy, <span class="string">"thread 4"</span>);</span><br><span class="line">    pthread_create(&amp;producter, <span class="literal">NULL</span>, product, <span class="string">"thread 5"</span>);</span><br><span class="line">   </span><br><span class="line">    pthread_join(buyyer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(producter, <span class="literal">NULL</span>);</span><br><span class="line">    </span><br><span class="line">    pthread_mutex_destroy(&amp;mutex); <span class="comment">//销毁锁</span></span><br><span class="line">    pthread_cond_destroy(&amp;cond); <span class="comment">//销毁条件变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中</p>
+<ul>
+<li><code>int pthread_cond_init(pthread_cond_t *cond,const pthread_condattr_t *rest rict attr);</code><ul>
+<li>cond:准备初始化的条件变量</li>
+<li>attr:NULL 默认配置</li>
+</ul>
+</li>
+<li><code>int pthread_cond_destroy(pthread_cond_t *cond)</code><ul>
+<li>销毁条件变量</li>
+</ul>
+</li>
+<li><code>int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t mutex);</code><ul>
+<li>等待条件的满足 </li>
+<li>函数一进入wait状态就会自动release mutex，退出时lock mutex</li>
+<li>cond:对应的条件变量</li>
+<li>mutex:相关的互斥量</li>
+</ul>
+</li>
+<li>唤醒<ul>
+<li><code>int pthread_cond_broadcast(pthread_cond_t *cond);</code> //唤醒所有等待线程</li>
+<li><code>int pthread_cond_signal(pthread_cond_t *cond);</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h2><p>互斥锁成功地保证了对临界资源访问的安全性，但额外会带来锁申请、释放的开销</p>
+<p>在读写两个线程操作频次差距巨大时（且读操作频繁且耗费时间较长（伴随查找））<br>两个读线程不会相互影响安全，却因为互斥锁带来了额外的开销，此时可以使用读写锁</p>
+<p>互斥锁只有两种状态，而读写锁有三种状态，以文件读写为例</p>
+<ul>
+<li>无锁<ul>
+<li>读写都不会被阻塞</li>
+</ul>
+</li>
+<li>读锁<ul>
+<li>其它读线程可以不阻塞的并发读，写操作申请锁会被阻塞</li>
+</ul>
+</li>
+<li>写锁<ul>
+<li>单线程的写操作，任何其他线程（包括其他写线程）都在申请锁时阻塞</li>
+</ul>
+</li>
+</ul>
+<p>根据读写锁的特性，在写锁没有申请时，读线程可以高并发的操作，提升整体性能<br>读写锁非常适合对数据结构读的次数远远大于写的情况</p>
+<p>思考：读线程源源不断时，写线程可能被饿死<br>所以读模式的线程接受到写请求时，应阻塞其后所有读线程</p>
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁类似于读写锁<br>但是保护安全的方式不是通过阻塞<br>而是通过 cpu忙等待（死循环轮询）的方式去等待解锁，以保护线程安全</p>
+<p>自旋锁适用：锁被持有的时间较短，而且进程并不希望在重新调度上花费太多的成本</p>
+<h2 id="RCU锁"><a href="#RCU锁" class="headerlink" title="RCU锁"></a>RCU锁</h2><p>（Read-Copy Update）：读-复制 更新</p>
+<p>实际上是对读写锁的一种改进，同样对读区别对待，但对待的方式不同<br>读写锁仅支持多个读操作，RCU还支持多个写操作</p>
+<p>RCU基本做法为<br>读操作不做限制<br>写操作总是在一个副本上修改，在合适的时机更新原件（所有读者都结束对临界资源的访问后，使用回调函数函数完成对原件的更新）</p>
+<p>限于篇幅，RCU深度剖析请移步另一篇博文（TODO）</p>
+<blockquote>
+<p>参考 <a href="https://blog.csdn.net/aganlengzi/article/details/51339519" target="_blank" rel="noopener">https://blog.csdn.net/aganlengzi/article/details/51339519</a></p>
+<h2 id="POSIX信号量"><a href="#POSIX信号量" class="headerlink" title="POSIX信号量"></a>POSIX信号量</h2><h3 id="与条件变量的对比"><a href="#与条件变量的对比" class="headerlink" title="与条件变量的对比"></a>与条件变量的对比</h3><p>条件变量总是与互斥锁一起使用的<br>那么换一个角度：</p>
+</blockquote>
+<ul>
+<li>条件变量和配合互斥锁时<ul>
+<li>互斥锁必须总是有给他上锁的线程解锁，信号量灵活的多</li>
+<li>互斥锁只有锁住、解开两种状态</li>
+</ul>
+</li>
+<li>条件变量做唤醒时，如果没有线程接受信号，信号将丢失</li>
+</ul>
+<h3 id="实例"><a href="#实例" class="headerlink" title="实例"></a>实例</h3><p>限于篇幅，请移步另一篇博文（TODO）</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    张鹏霄
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://sustyuxiao.github.io/2018/05/03/2018-05-03/" title="同步、互斥、读写锁、自旋锁、RCU锁">https://sustyuxiao.github.io/2018/05/03/2018-05-03/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/01/2018-05-01/" rel="next" title="线程基本API使用指北">
+                <i class="fa fa-chevron-left"></i> 线程基本API使用指北
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png"
+                alt="张鹏霄" />
+            
+              <p class="site-author-name" itemprop="name">张鹏霄</p>
+              <p class="site-description motion-element" itemprop="description">https://sustyuxiao.github.io</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/SUSTYuxiao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zpx736312737@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#临界资源引例：售票系统"><span class="nav-number">1.</span> <span class="nav-text">临界资源引例：售票系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加锁保护临界资源"><span class="nav-number">2.</span> <span class="nav-text">加锁保护临界资源</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#互斥实例"><span class="nav-number">2.1.</span> <span class="nav-text">互斥实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#互斥"><span class="nav-number">2.2.</span> <span class="nav-text">互斥</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读写锁"><span class="nav-number">3.</span> <span class="nav-text">读写锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自旋锁"><span class="nav-number">4.</span> <span class="nav-text">自旋锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RCU锁"><span class="nav-number">5.</span> <span class="nav-text">RCU锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POSIX信号量"><span class="nav-number">6.</span> <span class="nav-text">POSIX信号量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#与条件变量的对比"><span class="nav-number">6.1.</span> <span class="nav-text">与条件变量的对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例"><span class="nav-number">6.2.</span> <span class="nav-text">实例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+  
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+  </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张鹏霄</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://pages.github.com">GitHub Pages</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> &nbsp;PV
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      Statistics from 2018-05-01
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
