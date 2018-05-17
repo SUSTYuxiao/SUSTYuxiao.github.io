@@ -79,17 +79,20 @@
 
 
 
-<meta name="description" content="MobileTimeTable-Webview: https://zpx-1256061511.cos-website.ap-beijing.myqcloud.com">
+<meta name="description" content="TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="简易课表网页模版-移动设备适配">
-<meta property="og:url" content="https://sustyuxiao.github.io/2017/12/01/MobileTimeTable-Web/index.html">
+<meta property="og:title" content="剖析三次握手与TCP的可靠性">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/05/17/2018-05-17/index.html">
 <meta property="og:site_name" content="zpx&#39;s HomePage">
-<meta property="og:description" content="MobileTimeTable-Webview: https://zpx-1256061511.cos-website.ap-beijing.myqcloud.com">
+<meta property="og:description" content="TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-25T16:55:21.000Z">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand1.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand2.jpg">
+<meta property="og:updated_time" content="2018-05-17T10:50:24.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="简易课表网页模版-移动设备适配">
-<meta name="twitter:description" content="MobileTimeTable-Webview: https://zpx-1256061511.cos-website.ap-beijing.myqcloud.com">
+<meta name="twitter:title" content="剖析三次握手与TCP的可靠性">
+<meta name="twitter:description" content="TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程">
+<meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand1.jpg">
 
 
 
@@ -119,13 +122,13 @@
 
 
 
-  <link rel="canonical" href="https://sustyuxiao.github.io/2017/12/01/MobileTimeTable-Web/"/>
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/05/17/2018-05-17/"/>
 
 
 
 
 
-  <title>简易课表网页模版-移动设备适配 | zpx's HomePage</title>
+  <title>剖析三次握手与TCP的可靠性 | zpx's HomePage</title>
   
 
 
@@ -244,7 +247,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2017/12/01/MobileTimeTable-Web/">
+    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/05/17/2018-05-17/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="张鹏霄">
@@ -261,7 +264,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">简易课表网页模版-移动设备适配</h1>
+          <h1 class="post-title" itemprop="name headline">剖析三次握手与TCP的可靠性</h1>
         
 
         <div class="post-meta">
@@ -273,8 +276,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-01T00:00:00+08:00">
-                2017-12-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-17T00:00:00+08:00">
+                2018-05-17
               </time>
             
 
@@ -296,8 +299,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/GitHub-project/" itemprop="url" rel="index">
-                    <span itemprop="name">GitHub project</span>
+                  <a href="/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
                   </a>
                 </span>
 
@@ -338,22 +341,72 @@
       
 
       
-        <h2 id="MobileTimeTable-Web"><a href="#MobileTimeTable-Web" class="headerlink" title="MobileTimeTable-Web"></a>MobileTimeTable-Web</h2><p>view: <a href="https://zpx-1256061511.cos-website.ap-beijing.myqcloud.com" target="_blank" rel="noopener">https://zpx-1256061511.cos-website.ap-beijing.myqcloud.com</a></p>
+        <p>TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性<br>其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程</p>
 <a id="more"></a>
-<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>一个易维护的「HTML」模版，基于「bootstrap」布局</p>
-<p>优点</p>
+<h2 id="TCP连接的建立与断开的过程"><a href="#TCP连接的建立与断开的过程" class="headerlink" title="TCP连接的建立与断开的过程"></a>TCP连接的建立与断开的过程</h2><p>TCP通过「三次握手」保证连接的建立，「四次挥手」保证链接的断开<br>建立、断开时，TCP通过状态机的思想管理整个过程</p>
+<p>对于三次握手</p>
 <ul>
-<li>无app，体积小</li>
-<li>无app，无广告</li>
+<li>第一次：客户端发送SYN包（syn=j）到服务器，客户端进入SYN_SENT状态</li>
+<li>第二次：服务器收到SYN包，发送确认包（ack=j+1）和SYN包（syn=k），进入SYN_RECV状态</li>
+<li>第三次：客户端收到SYN+ACK包，向服务端发送ACK包（ack=k+1），进入ESTABLISHED状态<ul>
+<li>（服务端收到最后一个ACK包，也进入ESTABLISHED状态）</li>
 </ul>
-<h3 id="编辑指南"><a href="#编辑指南" class="headerlink" title="编辑指南"></a>编辑指南</h3><p>更改「第一周第一节课课程名」和「第二周第三节课课程名」</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Object</span>[<span class="number">1</span>][<span class="number">1</span>] = <span class="string">"计网"</span>;</span><br><span class="line"><span class="built_in">Object</span>[<span class="number">3</span>][<span class="number">2</span>] = <span class="string">"计网"</span>;</span><br></pre></td></tr></table></figure>
-<p>标记「第四周第一节课」为灰色（表示暂未开放）</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">isUnOpen[<span class="number">1</span>][<span class="number">4</span>] = <span class="string">"UnOpen"</span>;</span><br></pre></td></tr></table></figure>
-<h3 id="部署载体推荐"><a href="#部署载体推荐" class="headerlink" title="部署载体推荐"></a>部署载体推荐</h3><p>腾讯云提供了面向个人的免费对象存储，同时具有搭载静态博客的功能</p>
-<hr>
-<p>The project’s URL <a href="https://github.com/SUSTYuxiao/MobileTimeTable-Web" target="_blank" rel="noopener">https://github.com/SUSTYuxiao/MobileTimeTable-Web</a></p>
-<p>2017.12.1 By 张鹏霄 zpx736312737@126.com | Others in Blog <a href="https://sustyuxiao.github.io">https://sustyuxiao.github.io</a></p>
+</li>
+</ul>
+<p>对于四次挥手</p>
+<ul>
+<li>第一次：客户端发送FIN包（fin=j）到服务器，客户端进入FIN_WAIT_1状态</li>
+<li>第二次：服务器收到FIN包，发送确认包（ack=j+1），进入CLOSE_WAIT状态<ul>
+<li>（客户端收到FIN包， 进入FIN_WAIT_2状态）</li>
+</ul>
+</li>
+<li>第三次：服务器确定收到所有数据，并释放资源，发送FIN包（fin=k），进入LAST_ACK状态</li>
+<li>第四次：客户端收到FIN包，向服务端发送ACK包（ack=k+1），进入TIME_WAIT状态<ul>
+<li>（服务端收到最后一个ACK包，进入CLOSED状态）</li>
+</ul>
+</li>
+</ul>
+<p>图示为</p>
+<p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand1.jpg" height="80%" width="80%"></p>
+<h2 id="为什么必须经过三次握手"><a href="#为什么必须经过三次握手" class="headerlink" title="为什么必须经过三次握手"></a>为什么必须经过三次握手</h2><p>问题「为什么需要三次握手？」 可转化为 「为什么两次握手不可靠」<br>首先明确：没有返回确认的报文（即最后一次的报文）本身是不可靠的，二次握手是，三次握手也是<br>具体二次握手哪里不合适，接下来从两方面解释</p>
+<ul>
+<li>出现异常造成的故障的影响</li>
+<li>故障是否可以修复</li>
+</ul>
+<h3 id="假设网络只需二次握手"><a href="#假设网络只需二次握手" class="headerlink" title="假设网络只需二次握手"></a>假设网络只需二次握手</h3><p><img style="float:right" src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand2.jpg" height="40%" width="40%"></p>
+<p>在最后一个ACK没有收到时，服务端已经认为连接已经建立<br>服务端开始维护这个链接</p>
+<ul>
+<li>此时对于服务端<ul>
+<li>服务端认为连接建立好了，等待客户端发送消息</li>
+</ul>
+</li>
+<li>此时对于客户端<ul>
+<li>客户端一直等待ACK包，不会发消息</li>
+</ul>
+</li>
+</ul>
+<p><strong>此时故障会对服务端造成影响：</strong><br>客户端如果需要传输数据，只能发起一个新的连接请求<br>但此时这个故障对服务器的性能产生了恶劣影响：旧的连接会持续占用服务端的资源<br>如果客户端是恶意的，还可以通过大量SYN包攻击服务器（SYN洪水攻击）</p>
+<p>这个故障是不可修复的，尽管客户端可以通过某种手段（RST标志）通知服务端需要重新建立连接<br>但是服务端并不知道客户端需要重置哪个连接（服务端使用一个端口维护该客户端的多个连接）</p>
+<p><strong>结论：</strong>在二次握手下，故障会对服务器造成大的影响，且无法解决</p>
+<h3 id="三次握手可以解决问题"><a href="#三次握手可以解决问题" class="headerlink" title="三次握手可以解决问题"></a>三次握手可以解决问题</h3><p>在最后一个ACK没有收到时，服务端不认为连接已经建立，不会维护这个链接<br><strong>此时故障不会对服务端造成影响：</strong><br>至此问题基本解决了一半<br>（三次握手图参考图一）</p>
+<ul>
+<li>此时对于服务端<ul>
+<li>服务端认为连接没有建立</li>
+</ul>
+</li>
+<li>此时对于客户端<ul>
+<li>认为连接建立了，开始发送数据报</li>
+</ul>
+</li>
+</ul>
+<p>服务端在没有收到ACK的情况下先收到了数据，可以知道ACK出现了问题，可以发送带有RST标志的报文<br>服务端收到后即可重新建立连接</p>
+<p><strong>结论：</strong>在三次握手下，故障不会对服务器造成影响，且故障可以解决</p>
+<h2 id="为什么需要经过四次挥手"><a href="#为什么需要经过四次挥手" class="headerlink" title="为什么需要经过四次挥手"></a>为什么需要经过四次挥手</h2><p>四次挥手对比三次握手，主要区别在于服务端返回FIN与ACK包是分开进行的</p>
+<p>服务器需要时间关闭socket，不能立即发送表示我已经关闭了的FIN包<br>但为了避免客户端超时重发，先返回ACK包<br>所以共计四次挥手</p>
+<h2 id="为什么需要TIME-WAIT状态的设计"><a href="#为什么需要TIME-WAIT状态的设计" class="headerlink" title="为什么需要TIME_WAIT状态的设计"></a>为什么需要TIME_WAIT状态的设计</h2><p>客户端收到FIN后会进入TIME_WAIT，等待2MSL(Max Segment Life, 报文最大生存时间)的时间<br>这样做的原因还是因为：没有返回确认的报文是不可靠的</p>
+<p>客户端不能保证最后一次ACK成功被接收，因为最后一次报文没有返回确认</p>
+<p>但通过设计TIME_WAIT，客户端发送ACK后等待一些时间（2MSL）<br>如果ACK丢失，服务端会重发FIN，保证连接顺利关闭。<br>（如果TIME_WAIT没有收到FIN，则认为最后一次ACK抵达）</p>
+<p>另外，TIME_WAIT保证网络延迟的报文全部抵达</p>
 
       
     </div>
@@ -374,7 +427,7 @@
   </li>
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
-    <a href="https://sustyuxiao.github.io/2017/12/01/MobileTimeTable-Web/" title="简易课表网页模版-移动设备适配">https://sustyuxiao.github.io/2017/12/01/MobileTimeTable-Web/</a>
+    <a href="https://sustyuxiao.github.io/2018/05/17/2018-05-17/" title="剖析三次握手与TCP的可靠性">https://sustyuxiao.github.io/2018/05/17/2018-05-17/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>
@@ -396,8 +449,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/21/2017-11-21/" rel="next" title="模版/模版函数的全特化/偏特化与类型萃取">
-                <i class="fa fa-chevron-left"></i> 模版/模版函数的全特化/偏特化与类型萃取
+              <a href="/2018/05/12/2018-05-12/" rel="next" title="进程间关系：作业、会话和守护进程">
+                <i class="fa fa-chevron-left"></i> 进程间关系：作业、会话和守护进程
               </a>
             
           </div>
@@ -405,10 +458,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/02/04/2018-02-04/" rel="prev" title="浅析 C++ 智能指针">
-                浅析 C++ 智能指针 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -551,7 +600,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MobileTimeTable-Web"><span class="nav-number">1.</span> <span class="nav-text">MobileTimeTable-Web</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑指南"><span class="nav-number">1.2.</span> <span class="nav-text">编辑指南</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署载体推荐"><span class="nav-number">1.3.</span> <span class="nav-text">部署载体推荐</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP连接的建立与断开的过程"><span class="nav-number">1.</span> <span class="nav-text">TCP连接的建立与断开的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么必须经过三次握手"><span class="nav-number">2.</span> <span class="nav-text">为什么必须经过三次握手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#假设网络只需二次握手"><span class="nav-number">2.1.</span> <span class="nav-text">假设网络只需二次握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手可以解决问题"><span class="nav-number">2.2.</span> <span class="nav-text">三次握手可以解决问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要经过四次挥手"><span class="nav-number">3.</span> <span class="nav-text">为什么需要经过四次挥手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要TIME-WAIT状态的设计"><span class="nav-number">4.</span> <span class="nav-text">为什么需要TIME_WAIT状态的设计</span></a></li></ol></div>
             
 
           </div>
