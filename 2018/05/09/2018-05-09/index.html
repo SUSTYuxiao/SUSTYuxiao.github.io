@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="自第一次输出“hello world”「源代码如何变成可执行文件」的问题就一直伴随着我本次以《程序员的自我修养—链接、装载与库》为参考，对这一过程做简单总结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="概述从源码到可执行文件">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/05/09/2018-05-09/index.html">
+<meta property="og:site_name" content="zpx&#39;s HomePage">
+<meta property="og:description" content="自第一次输出“hello world”「源代码如何变成可执行文件」的问题就一直伴随着我本次以《程序员的自我修养—链接、装载与库》为参考，对这一过程做简单总结">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree1.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree2.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree3.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree4.jpg">
+<meta property="og:updated_time" content="2018-05-09T11:49:25.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="概述从源码到可执行文件">
+<meta name="twitter:description" content="自第一次输出“hello world”「源代码如何变成可执行文件」的问题就一直伴随着我本次以《程序员的自我修养—链接、装载与库》为参考，对这一过程做简单总结">
+<meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/05/09/2018-05-09/"/>
+
+
+
+
+
+  <title>概述从源码到可执行文件 | zpx's HomePage</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-post-detail
+">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zpx's HomePage</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/05/09/2018-05-09/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张鹏霄">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zpx's HomePage">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">概述从源码到可执行文件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-09T00:00:00+08:00">
+                2018-05-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-C/" itemprop="url" rel="index">
+                    <span itemprop="name">C/C++</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"> </i>&nbsp;PV
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody" >
+
+      
+      
+
+      
+        <p>自第一次输出“hello world”<br>「源代码如何变成可执行文件」的问题就一直伴随着我<br>本次以《程序员的自我修养—链接、装载与库》为参考，对这一过程做简单总结</p>
+<a id="more"></a>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>高级语言的出现使得程序员可以<br>尽量少考虑计算机本身的限制（如字长、内存大小、通信方式、存储方式）<br>相对的，程序员可以拥有更多精力在程序逻辑本身<br>结合高可移植性，高级语言使得开发效率得到极大的提高</p>
+<p>可我们仍需学习高级语言到生成个执行文件到处理过程，我们才能够<br>更深刻地理解操作系统，同时对大型项目链接器类错误的处理游刃有余，<br>具体从源文件到可执行文件到过程，经过了预编译、编译、汇编、链接四个阶段<br>本文主要介绍前三个阶段，对于链接的更多细节问题，请跳转另一篇博文（TODO）</p>
+<h2 id="预编译"><a href="#预编译" class="headerlink" title="预编译"></a>预编译</h2><p>负责源代码中#开头的预编译命令<br>主要规则如下</p>
+<ul>
+<li>处理预编译指令（<code>#ifndef</code>）</li>
+<li>添加调试所需要的行号与文件名标识</li>
+<li>插入库（include）</li>
+<li>宏替换</li>
+<li>去注释</li>
+</ul>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>负责把预处理的文件分别进行</p>
+<ul>
+<li>词法分析</li>
+<li>语法分析</li>
+<li>语义分析</li>
+<li>生成中间代码</li>
+<li>目标代码的生成和优化</li>
+</ul>
+<h3 id="词法分析"><a href="#词法分析" class="headerlink" title="词法分析"></a>词法分析</h3><p>词法分析会按照预置好的规则将字符串分割为一个个记号<br>记号分为关键字、标识符、字面量（数字、字符串等）、特殊符号（加号、等号等）</p>
+<p>以<code>array[index] = (index + 4) * (2 + 6)</code>为例<br>词法分析会将代码分割为array、[、index、]等记号，并分类存放（标识符置符号标、数字置文字表等）<br>词法分析是为之后的步骤服务的</p>
+<h3 id="语法分析"><a href="#语法分析" class="headerlink" title="语法分析"></a>语法分析</h3><p>语法分析使用「上下文无关语法」的分析手段产生「语法树」<br>所谓语法树就是以「表达式」为节点的树</p>
+<p>上例中的代码就是一个由赋值、加法、乘法、数组、括号表达式组成的复杂语句<br>经过语法分析后生成<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree1.jpg" height="80%" width="80%"></p>
+<p>整个语句被认为是一个赋值表达式，赋值表达式左边是数组表达式，右边是乘法表达式<br>数字是最小的表达式，被作为语法书的叶节点</p>
+<p>语法分析过程中会确定运算符的优先级和含义（*号可以表示取指针内容，也可以是乘法）<br>如果出现括号不匹配、缺少操作符的问题，编译器会报告语法分析过程中的错误</p>
+<h3 id="语义分析"><a href="#语义分析" class="headerlink" title="语义分析"></a>语义分析</h3><p>语法分析仅仅针对语法层面判断是否合法，并不分析表达式是否真的有意义<br>（C中指针做乘法运算是合法的，但没有意义）</p>
+<p>语义分析分为静态语义分析和动态语义分析<br>动态语义分析指运行期间的语义问题，如0作为除数进行运算<br>编辑器该阶段只进行静态语义分析</p>
+<p>静态语义分析包括包括声明与类型的匹配、转换，包括：</p>
+<ul>
+<li>浮点型表达式赋值给整型表达式，隐含了类型转换，此时语义分析需处理语法树</li>
+<li>浮点型表达式赋值给指针，模式不匹配，编译器报错</li>
+</ul>
+<p>语义分析后整个语法树的表达式都被标示了类型<br>如果有隐含的类型转换，语义分析会在语法树插入相应的转换节点<br>上例中所有表达式类型都是整型，不需要转换，此时语法树为<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree2.jpg" height="80%" width="80%"></p>
+<h3 id="中间语言生成"><a href="#中间语言生成" class="headerlink" title="中间语言生成"></a>中间语言生成</h3><p>此时会进行编译器多层优化中的源码级优化<br>形如<code>(2 + 6)</code>的表达式的值在编译期间就可以确定，可以优化</p>
+<p>该阶段语法树会被转换为「中间代码」，即语法树的顺序表示<br>常见的中间代码分为「三地址码」和「P-代码」<br>最基本的三地址码为 <code>X = Y op A</code>,表示Y，Z进行op操作后赋值给A<br>上例中的语法树转换成三地址码为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">t1 = 2 + 6</span><br><span class="line">t2 = index + 4</span><br><span class="line">t3 = t2 * t1</span><br><span class="line">array[index] = t3</span><br></pre></td></tr></table></figure>
+<p>优化后为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">t1 = index + 4</span><br><span class="line">t2 = t1 * 8</span><br><span class="line">array[index] = t2</span><br></pre></td></tr></table></figure>
+<p>中间代码是最后的与目标机器运行环境无关的代码<br>因此中间代码使得编译器可以分为前端和后端</p>
+<ul>
+<li>编译器前端负责产生与机器外观的中间代码</li>
+<li>编译器后端负责将中间代码转换为目标机器码</li>
+</ul>
+<p>这样跨平台编译器可以使用一个前端、不同后端</p>
+<h3 id="目标代码的生成和优化"><a href="#目标代码的生成和优化" class="headerlink" title="目标代码的生成和优化"></a>目标代码的生成和优化</h3><p>中间代码的生成意味着接下来的工作属于编译器后端<br>编译器后端主要包括目标代码生成器和目标代码优化器</p>
+<p>对于上述例子，可能会生成以下汇编代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">movl index, %ecx</span><br><span class="line">addl $4, %ecx</span><br><span class="line">mull $8, %ecx</span><br><span class="line">movl index, %eax</span><br><span class="line">movl %ecx, array(,eax,4)</span><br></pre></td></tr></table></figure>
+<p>代码优化器处理后为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">movl index, %edx</span><br><span class="line">leal 32(,%edx,8), %eax</span><br><span class="line">movl %eax, array(,%edx,4)</span><br></pre></td></tr></table></figure>
+<p>上述若干个步骤后，源代码终于被编译成了目标代码<br>但此时目标代码存在问题：index和array的地址还没有确定</p>
+<p>index、array的定义和源代码在同一个编译单元里，则可以直接为index和array分配空间<br>事实上所有的源代码都在一个编译单元是不可能的<br>所以现代编译器在将每个源代码编译成未链接的目标文件后，随后还要由链接器链接起来形成可执行文件</p>
+<h2 id="汇编与链接"><a href="#汇编与链接" class="headerlink" title="汇编与链接"></a>汇编与链接</h2><h3 id="转机器码"><a href="#转机器码" class="headerlink" title="转机器码"></a>转机器码</h3><p>在链接前，还要经历汇编代码转成机器码的过程。</p>
+<p>汇编没有分析、没有优化，只是通过预设规则将汇编代码一一转换为机器码<br>此时若干源文件经过一系列处理已经变成若干个目标文件，在linux下后缀为.o<br>一个目标文件中至少有两个段：代码段和数据段，目标文件的内容不在本文详细展开</p>
+<p>unix环境下主要有三种类型的目标文件</p>
+<ul>
+<li>可重定位文件：二进制代码和数据，由各个数据节（section）构成，从地址0开始</li>
+<li>共享的目标文件：一种特殊类型的可重定位目标文件，用于动态加载链接</li>
+<li>可执行文件：可以被操作系统创建一个进程来执行的文件。汇编生成是可重定位文件</li>
+</ul>
+<p>后两种目标文件的创建则是链接程序的工作</p>
+<h3 id="代码的链接"><a href="#代码的链接" class="headerlink" title="代码的链接"></a>代码的链接</h3><p>链接的工作即是把一些指令对其他符号的地址的引用加以修正<br>其过程主要包括了地址空间分配、符号决议（或名称绑定）和重定位<br>地址空间分配不再赘述，链接器接下来主要需要做符号决议或名称绑定</p>
+<h4 id="决议-绑定"><a href="#决议-绑定" class="headerlink" title="决议/绑定"></a>决议/绑定</h4><p>我们的程序肯定会调用各类库，可执行文件与库代码之间联系的处理<br>这便是链接所需做的第一步：符号解析，即符号决议或名称绑定<br>决议主要指的是静态链接，绑定主要指的是动态链接</p>
+<p>静态链接：在程序执行之前完成所有的组装工作，生成一个可执行的目标文件（EXE文件）。<br>动态链接：在程序执行被装入内存之后完成链接工作，会独立一个dll文件，运行时灵活“装卸”</p>
+<p>静态链接与动态链接限于篇幅不在此详细展开<br>文本仅介绍这一阶段牵扯到的符号表的概念</p>
+<p>之前提到汇编生成的目标文件为可重定位文件，unix环境下格式为ELF<br>一个典型的ELF文件包括</p>
+<p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree3.jpg" height="50%" width="50%"></p>
+<p>ELF具体各节意义不在此详细展开</p>
+<p>但值得强调的是每个可重定位目标模块m都有一个符号表，包含其所定义的、引用的符号信息<br>以C为例，符号分为三种</p>
+<ul>
+<li>全局符号 被m定义，能被其他模块引用 对应非静态的C函数和非静态的C的全局变量</li>
+<li>外部符号 由其他模块定义，被m引用 对应定义在其他模块中的C函数与变量</li>
+<li>本地符号 带static属性的C函数或全局变量，在m内可见，不可以被其他模块引用</li>
+</ul>
+<p>为了用户能够定义自己的符号同时不和库中的冲突，还有强符号、弱符号的概念<br>库中定义的弱符号可以被用户定义的强符号覆盖，从而使程序可以使用自己定义版本的库函数<br>强弱符号在链接时遵循</p>
+<ul>
+<li>不允许强符号被多次定义，否则报错重定义</li>
+<li>如果符号在某个文件中是强符号，在其他文件中是弱符号，则选择强符号</li>
+<li>如果一个符号在所有文件中都是弱符号，则选择其中占用空间最大的</li>
+</ul>
+<p>相关还有强引用和弱引用的概念</p>
+<ul>
+<li>强引用 目标文件引用了外部符号，在链接时若未找到定义，报错；对该外部符号的引用为强引用</li>
+<li>弱引用 目标文件引用了外部符号，在链接时若未找到定义不报错；对该外部符号的引用为弱引用</li>
+</ul>
+<p>有了符号表，词啊方便了链接程序进行之后重定位的工作</p>
+<p>经过静态、动态链接，程序已经集合了所有需要的模块，最后的工作就是通过重定位相互联系起来</p>
+<h4 id="重定位"><a href="#重定位" class="headerlink" title="重定位"></a>重定位</h4><p>正如编译最后所说：所有的程序代码不可能放置在一个模块<br>各个模块之间如何联系起来，生成最后的代码，这是链接的第二步工作：重定位</p>
+<p>回顾一下现在遇到的问题：<br>一个程序被分为多个模块后，模块之间不知道如何组合，即模块之间如何通信的问题。<br>模块之间通信有两种方式：模块间的函数调用、模块间的变量访问<br>函数访问需要目标函数的地址，变量访问也需要知道目标变量的地址<br>两种方式可以归结为一种方式：模块间符号的引用</p>
+<p>处理不同模块符号间引用即对定义在其他目标文件中的函数/变量调用对应地址重新调整</p>
+<p>假如有全局变量var在目标文件A中，在目标文件B中访问该全局变量<br>具体在B中原汇编代码有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">movl s0x2a, var  ;将变量var赋值0x2a（42）</span><br></pre></td></tr></table></figure>
+<p>编译后得到机器码<br><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/GrammarTree4.jpg" height="70%" width="70%"></p>
+<p>在编译B时，编译器并不知道var的地址，因此将这条mov指令的目标地址置0，在链接器处理时，才将var的地址确定下来，修改指令的目标地址为0x10000<br>这个修正的过程中即为重定位，每个要被修正的地方叫重定位入口</p>
+<h4 id="得到可执行文件"><a href="#得到可执行文件" class="headerlink" title="得到可执行文件"></a>得到可执行文件</h4><p>经过上述步骤，源代码被一步步处理为机器码，在最后将各个目标文件联系起来<br>终于得到了最后的二进制可执行文件</p>
+<p>后缀为.o的目标文件内部的详细处理<br>C++的符号处理与函数签名<br>动态链接的各种细节<br>更多信息限于篇幅不在此展开<br>向大家推荐图书：《程序员的自我修养—链接、装载与库》以及《深入理解计算机系统》第七章</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    张鹏霄
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://sustyuxiao.github.io/2018/05/09/2018-05-09/" title="概述从源码到可执行文件">https://sustyuxiao.github.io/2018/05/09/2018-05-09/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/06/2018-05-06/" rel="next" title="TCP/UDP的基本Socket编程">
+                <i class="fa fa-chevron-left"></i> TCP/UDP的基本Socket编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/12/2018-05-12/" rel="prev" title="进程间关系：作业、会话和守护进程">
+                进程间关系：作业、会话和守护进程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png"
+                alt="张鹏霄" />
+            
+              <p class="site-author-name" itemprop="name">张鹏霄</p>
+              <p class="site-description motion-element" itemprop="description">https://sustyuxiao.github.io</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/SUSTYuxiao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zpx736312737@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预编译"><span class="nav-number">2.</span> <span class="nav-text">预编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编译"><span class="nav-number">3.</span> <span class="nav-text">编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#词法分析"><span class="nav-number">3.1.</span> <span class="nav-text">词法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语法分析"><span class="nav-number">3.2.</span> <span class="nav-text">语法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语义分析"><span class="nav-number">3.3.</span> <span class="nav-text">语义分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中间语言生成"><span class="nav-number">3.4.</span> <span class="nav-text">中间语言生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#目标代码的生成和优化"><span class="nav-number">3.5.</span> <span class="nav-text">目标代码的生成和优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#汇编与链接"><span class="nav-number">4.</span> <span class="nav-text">汇编与链接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#转机器码"><span class="nav-number">4.1.</span> <span class="nav-text">转机器码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码的链接"><span class="nav-number">4.2.</span> <span class="nav-text">代码的链接</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#决议-绑定"><span class="nav-number">4.2.1.</span> <span class="nav-text">决议/绑定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重定位"><span class="nav-number">4.2.2.</span> <span class="nav-text">重定位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#得到可执行文件"><span class="nav-number">4.2.3.</span> <span class="nav-text">得到可执行文件</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+  
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+  </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张鹏霄</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://pages.github.com">GitHub Pages</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> &nbsp;PV
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      Statistics from 2018-05-01
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

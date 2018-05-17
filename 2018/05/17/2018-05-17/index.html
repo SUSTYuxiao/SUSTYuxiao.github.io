@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="剖析三次握手与TCP的可靠性">
+<meta property="og:url" content="https://sustyuxiao.github.io/2018/05/17/2018-05-17/index.html">
+<meta property="og:site_name" content="zpx&#39;s HomePage">
+<meta property="og:description" content="TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand1.jpg">
+<meta property="og:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand2.jpg">
+<meta property="og:updated_time" content="2018-05-17T10:50:24.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="剖析三次握手与TCP的可靠性">
+<meta name="twitter:description" content="TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程">
+<meta name="twitter:image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://sustyuxiao.github.io/2018/05/17/2018-05-17/"/>
+
+
+
+
+
+  <title>剖析三次握手与TCP的可靠性 | zpx's HomePage</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-post-detail
+">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zpx's HomePage</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://sustyuxiao.github.io/2018/05/17/2018-05-17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="张鹏霄">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zpx's HomePage">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">剖析三次握手与TCP的可靠性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-17T00:00:00+08:00">
+                2018-05-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络编程/" itemprop="url" rel="index">
+                    <span itemprop="name">网络编程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-eye"> </i>&nbsp;PV
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody" >
+
+      
+      
+
+      
+        <p>TCP通过校验和、序列号、确认应答、超时重发、流量控制、拥塞控制等保证可靠性<br>其中TCP连接的建立与断开过程值得深究，有助于深刻理解套接字编程</p>
+<a id="more"></a>
+<h2 id="TCP连接的建立与断开的过程"><a href="#TCP连接的建立与断开的过程" class="headerlink" title="TCP连接的建立与断开的过程"></a>TCP连接的建立与断开的过程</h2><p>TCP通过「三次握手」保证连接的建立，「四次挥手」保证链接的断开<br>建立、断开时，TCP通过状态机的思想管理整个过程</p>
+<p>对于三次握手</p>
+<ul>
+<li>第一次：客户端发送SYN包（syn=j）到服务器，客户端进入SYN_SENT状态</li>
+<li>第二次：服务器收到SYN包，发送确认包（ack=j+1）和SYN包（syn=k），进入SYN_RECV状态</li>
+<li>第三次：客户端收到SYN+ACK包，向服务端发送ACK包（ack=k+1），进入ESTABLISHED状态<ul>
+<li>（服务端收到最后一个ACK包，也进入ESTABLISHED状态）</li>
+</ul>
+</li>
+</ul>
+<p>对于四次挥手</p>
+<ul>
+<li>第一次：客户端发送FIN包（fin=j）到服务器，客户端进入FIN_WAIT_1状态</li>
+<li>第二次：服务器收到FIN包，发送确认包（ack=j+1），进入CLOSE_WAIT状态<ul>
+<li>（客户端收到FIN包， 进入FIN_WAIT_2状态）</li>
+</ul>
+</li>
+<li>第三次：服务器确定收到所有数据，并释放资源，发送FIN包（fin=k），进入LAST_ACK状态</li>
+<li>第四次：客户端收到FIN包，向服务端发送ACK包（ack=k+1），进入TIME_WAIT状态<ul>
+<li>（服务端收到最后一个ACK包，进入CLOSED状态）</li>
+</ul>
+</li>
+</ul>
+<p>图示为</p>
+<p><img src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand1.jpg" height="80%" width="80%"></p>
+<h2 id="为什么必须经过三次握手"><a href="#为什么必须经过三次握手" class="headerlink" title="为什么必须经过三次握手"></a>为什么必须经过三次握手</h2><p>问题「为什么需要三次握手？」 可转化为 「为什么两次握手不可靠」<br>首先明确：没有返回确认的报文（即最后一次的报文）本身是不可靠的，二次握手是，三次握手也是<br>具体二次握手哪里不合适，接下来从两方面解释</p>
+<ul>
+<li>出现异常造成的故障的影响</li>
+<li>故障是否可以修复</li>
+</ul>
+<h3 id="假设网络只需二次握手"><a href="#假设网络只需二次握手" class="headerlink" title="假设网络只需二次握手"></a>假设网络只需二次握手</h3><p><img style="float:right" src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/blog_18_05/TCP3hand2.jpg" height="40%" width="40%"></p>
+<p>在最后一个ACK没有收到时，服务端已经认为连接已经建立<br>服务端开始维护这个链接</p>
+<ul>
+<li>此时对于服务端<ul>
+<li>服务端认为连接建立好了，等待客户端发送消息</li>
+</ul>
+</li>
+<li>此时对于客户端<ul>
+<li>客户端一直等待ACK包，不会发消息</li>
+</ul>
+</li>
+</ul>
+<p><strong>此时故障会对服务端造成影响：</strong><br>客户端如果需要传输数据，只能发起一个新的连接请求<br>但此时这个故障对服务器的性能产生了恶劣影响：旧的连接会持续占用服务端的资源<br>如果客户端是恶意的，还可以通过大量SYN包攻击服务器（SYN洪水攻击）</p>
+<p>这个故障是不可修复的，尽管客户端可以通过某种手段（RST标志）通知服务端需要重新建立连接<br>但是服务端并不知道客户端需要重置哪个连接（服务端使用一个端口维护该客户端的多个连接）</p>
+<p><strong>结论：</strong>在二次握手下，故障会对服务器造成大的影响，且无法解决</p>
+<h3 id="三次握手可以解决问题"><a href="#三次握手可以解决问题" class="headerlink" title="三次握手可以解决问题"></a>三次握手可以解决问题</h3><p>在最后一个ACK没有收到时，服务端不认为连接已经建立，不会维护这个链接<br><strong>此时故障不会对服务端造成影响：</strong><br>至此问题基本解决了一半<br>（三次握手图参考图一）</p>
+<ul>
+<li>此时对于服务端<ul>
+<li>服务端认为连接没有建立</li>
+</ul>
+</li>
+<li>此时对于客户端<ul>
+<li>认为连接建立了，开始发送数据报</li>
+</ul>
+</li>
+</ul>
+<p>服务端在没有收到ACK的情况下先收到了数据，可以知道ACK出现了问题，可以发送带有RST标志的报文<br>服务端收到后即可重新建立连接</p>
+<p><strong>结论：</strong>在三次握手下，故障不会对服务器造成影响，且故障可以解决</p>
+<h2 id="为什么需要经过四次挥手"><a href="#为什么需要经过四次挥手" class="headerlink" title="为什么需要经过四次挥手"></a>为什么需要经过四次挥手</h2><p>四次挥手对比三次握手，主要区别在于服务端返回FIN与ACK包是分开进行的</p>
+<p>服务器需要时间关闭socket，不能立即发送表示我已经关闭了的FIN包<br>但为了避免客户端超时重发，先返回ACK包<br>所以共计四次挥手</p>
+<h2 id="为什么需要TIME-WAIT状态的设计"><a href="#为什么需要TIME-WAIT状态的设计" class="headerlink" title="为什么需要TIME_WAIT状态的设计"></a>为什么需要TIME_WAIT状态的设计</h2><p>客户端收到FIN后会进入TIME_WAIT，等待2MSL(Max Segment Life, 报文最大生存时间)的时间<br>这样做的原因还是因为：没有返回确认的报文是不可靠的</p>
+<p>客户端不能保证最后一次ACK成功被接收，因为最后一次报文没有返回确认</p>
+<p>但通过设计TIME_WAIT，客户端发送ACK后等待一些时间（2MSL）<br>如果ACK丢失，服务端会重发FIN，保证连接顺利关闭。<br>（如果TIME_WAIT没有收到FIN，则认为最后一次ACK抵达）</p>
+<p>另外，TIME_WAIT保证网络延迟的报文全部抵达</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    张鹏霄
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://sustyuxiao.github.io/2018/05/17/2018-05-17/" title="剖析三次握手与TCP的可靠性">https://sustyuxiao.github.io/2018/05/17/2018-05-17/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/12/2018-05-12/" rel="next" title="进程间关系：作业、会话和守护进程">
+                <i class="fa fa-chevron-left"></i> 进程间关系：作业、会话和守护进程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://zpx-1256061511.cos.ap-beijing.myqcloud.com/avatar.png"
+                alt="张鹏霄" />
+            
+              <p class="site-author-name" itemprop="name">张鹏霄</p>
+              <p class="site-description motion-element" itemprop="description">https://sustyuxiao.github.io</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/SUSTYuxiao" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i></a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:zpx736312737@126.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i></a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP连接的建立与断开的过程"><span class="nav-number">1.</span> <span class="nav-text">TCP连接的建立与断开的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么必须经过三次握手"><span class="nav-number">2.</span> <span class="nav-text">为什么必须经过三次握手</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#假设网络只需二次握手"><span class="nav-number">2.1.</span> <span class="nav-text">假设网络只需二次握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手可以解决问题"><span class="nav-number">2.2.</span> <span class="nav-text">三次握手可以解决问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要经过四次挥手"><span class="nav-number">3.</span> <span class="nav-text">为什么需要经过四次挥手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么需要TIME-WAIT状态的设计"><span class="nav-number">4.</span> <span class="nav-text">为什么需要TIME_WAIT状态的设计</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+  
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+  </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">张鹏霄</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" href="https://pages.github.com">GitHub Pages</a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> &nbsp;PV
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      Statistics from 2018-05-01
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
